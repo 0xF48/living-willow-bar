@@ -1,4 +1,5 @@
 import { DrinkId, Ingredient, BodySystem } from './enums';
+import { INGREDIENTS } from './ingredients';
 
 // Drink data interface
 interface DrinkData {
@@ -11,9 +12,32 @@ interface DrinkData {
   boost: Ingredient;
   boostEffects: string[];
   systemTargets: BodySystem[];
+  // Effects matrix: [energy, stress, inflammation, digestion, circulation, immunity, hydration, detox]
+  // Same format as IngredientData for direct health matrix matching
+  effectsMatrix: [number, number, number, number, number, number, number, number];
 }
 
-export const DRINKS: Record<DrinkId, DrinkData> = {
+// Helper function to calculate drink effects matrix from ingredients
+const calculateDrinkEffects = (baseIngredients: Ingredient[], boost: Ingredient): [number, number, number, number, number, number, number, number] => {
+  const allIngredients = [...baseIngredients, boost];
+  const effects: [number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0];
+  
+  // Sum effects from all ingredients with boost ingredient weighted higher (1.5x)
+  allIngredients.forEach((ingredient, index) => {
+    const ingredientData = INGREDIENTS[ingredient];
+    const weight = ingredient === boost ? 1.5 : 1; // Boost ingredients have higher impact
+    
+    for (let i = 0; i < 8; i++) {
+      effects[i] += ingredientData.effects[i] * weight;
+    }
+  });
+  
+  // Normalize by number of ingredients to prevent overwhelming effects from complex formulas
+  const normalizer = allIngredients.length * 0.8; // Slight reduction to keep effects reasonable
+  return effects.map(effect => Math.round((effect / normalizer) * 100) / 100) as [number, number, number, number, number, number, number, number];
+};
+
+const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.SPIRIT_CACAO]: {
     name: "Spirit Cacao",
     emoji: "🫘",
@@ -200,6 +224,17 @@ export const DRINKS: Record<DrinkId, DrinkData> = {
   }
 };
 
+// Calculate and add effects matrices to all drinks
+export const DRINKS: Record<DrinkId, DrinkData> = Object.fromEntries(
+  Object.entries(DRINKS_BASE).map(([drinkId, drinkData]) => [
+    drinkId,
+    {
+      ...drinkData,
+      effectsMatrix: calculateDrinkEffects(drinkData.baseIngredients, drinkData.boost)
+    }
+  ])
+) as Record<DrinkId, DrinkData>;
+
 // Helper function to get drink data
 export const getDrink = (drinkId: DrinkId): DrinkData => {
   return DRINKS[drinkId];
@@ -216,4 +251,35 @@ export const getDrinksBySystem = (system: BodySystem): DrinkId[] => {
   return Object.entries(DRINKS)
     .filter(([_, drink]) => drink.systemTargets.includes(system))
     .map(([drinkId, _]) => drinkId as DrinkId);
+};
+
+// Helper function to get drink effects matrix
+export const getDrinkEffects = (drinkId: DrinkId): [number, number, number, number, number, number, number, number] => {
+  return DRINKS[drinkId].effectsMatrix;
+};
+
+// Helper function to calculate drink similarity to health matrix
+export const calculateDrinkMatch = (
+  drinkId: DrinkId, 
+  healthMatrix: [number, number, number, number, number, number, number, number]
+): number => {
+  const drinkEffects = getDrinkEffects(drinkId);
+  let similarity = 0;
+  
+  // Calculate similarity score based on how well drink effects match health needs
+  for (let i = 0; i < 8; i++) {
+    const need = Math.abs(healthMatrix[i]);
+    const provision = Math.abs(drinkEffects[i]);
+    
+    // If there's a need and the drink provides it, add to similarity
+    if (need > 0 && provision > 0) {
+      similarity += Math.min(need, provision) * 2; // Bonus for matching needs
+    }
+    // Slight penalty if drink provides strong effect when there's no need
+    else if (need === 0 && provision > 0.3) {
+      similarity -= provision * 0.1;
+    }
+  }
+  
+  return Math.max(0, similarity); // Ensure non-negative score
 };
