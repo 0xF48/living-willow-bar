@@ -95,7 +95,7 @@ export enum EffectType {
   INFLAMMATION = 2,
   DIGESTION = 3,
   CIRCULATION = 4,
-  
+
   // Support effects (0 to 1)
   IMMUNITY = 5,
   HYDRATION = 6,
@@ -123,7 +123,7 @@ export const EFFECT_MODES: Record<EffectType, EffectMode> = {
 // Body system categories for survey mapping
 export enum BodySystem {
   MENTAL = 'mental',
-  DIGESTIVE = 'digestive', 
+  DIGESTIVE = 'digestive',
   VITALITY = 'vitality',
   RECOVERY = 'recovery'
 }
@@ -151,4 +151,31 @@ export const isRegulatoryEffect = (effect: EffectType): boolean => {
 
 export const isSupportEffect = (effect: EffectType): boolean => {
   return EFFECT_MODES[effect] === EffectMode.SUPPORT;
+}
+
+
+
+
+
+
+
+export enum Nav {
+  RECEIPT,
+  ORDER,
+  MENU,
+  SURVEY
+}
+
+export const NAV_COLORS = {
+  [Nav.RECEIPT]: 'bg-yellow text-black',
+  [Nav.ORDER]: 'bg-green text-black',
+  [Nav.MENU]: 'bg-black text-white',
+  [Nav.SURVEY]: 'bg-white text-black'
+}
+
+export const NAV_LABELS = {
+  [Nav.RECEIPT]: 'receipt',
+  [Nav.ORDER]: 'order',
+  [Nav.MENU]: 'menu',
+  [Nav.SURVEY]: 'survey',
 }
