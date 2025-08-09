@@ -2,11 +2,7 @@ import { BodySystem, EffectType, HealthMatrix } from './enums';
 
 // Sample conversation starters by category
 export const CONVERSATION_STARTERS = {
-  welcome: [
-    "Welcome! I'm here to help find your perfect wellness elixir. How are you feeling in your body right now?",
-    "Hi! I'm your wellness guide. What's bringing you here today - what would you like support with?",
-    "Hello! Let's find an elixir that matches your current needs. How would you describe your energy and mood today?"
-  ],
+
 
   followUp: {
     stress: [

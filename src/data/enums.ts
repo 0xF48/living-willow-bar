@@ -4,7 +4,16 @@ export enum CONFIG {
   SURVEY_MIN_CONFIDENCE = 0.6
 }
 
+export const WELCOME_QUESTIONS = [
+  "Welcome! I'm here to help find your perfect wellness elixir. How are you feeling in your body right now?",
+  "Hi! I'm your wellness guide. What's bringing you here today - what would you like support with?",
+  "Hello! Let's find an elixir that matches your current needs. How would you describe your energy and mood today?"
+]
 
+export const WELCOME_TITLES = [
+  'Welcome!',
+  'Hey There!'
+]
 
 
 // Ingredient enum for all elixir ingredients
@@ -129,12 +138,45 @@ export const EFFECT_MODES: Record<EffectType, EffectMode> = {
   [EffectType.DETOX]: EffectMode.SUPPORT
 }
 
+
+
 // Body system categories for survey mapping
 export enum BodySystem {
   MENTAL,
   DIGESTIVE,
   VITALITY,
   RECOVERY
+}
+
+
+
+
+
+export const BodySystems: Record<BodySystem, BodySystemType> = {
+  [BodySystem.MENTAL]: {
+    title: 'Mental & Emotional',
+    description: 'stress, anxiety, focus, or mood',
+    emoji: '🧠',
+    effects: [EffectType.ENERGY, EffectType.STRESS],
+  },
+  [BodySystem.DIGESTIVE]: {
+    title: 'Digestive & Gut Health',
+    description: 'bloating, discomfort, or digestive issues',
+    emoji: '🌿',
+    effects: [EffectType.DIGESTION, EffectType.INFLAMMATION]
+  },
+  [BodySystem.VITALITY]: {
+    title: 'Physical Energy & Circulation',
+    description: 'fatigue, stamina, or feeling sluggish',
+    emoji: '❤️',
+    effects: [EffectType.ENERGY, EffectType.CIRCULATION, EffectType.IMMUNITY],
+  },
+  [BodySystem.RECOVERY]: {
+    title: 'Recovery & Detox',
+    description: 'feeling run down, dehydrated, or needing cleansing',
+    emoji: '💧',
+    effects: [EffectType.HYDRATION, EffectType.DETOX, EffectType.INFLAMMATION]
+  }
 }
 
 export type BodySystemType = {
@@ -264,50 +306,62 @@ export const AI_CONFIG = {
   API_URL: 'https://api.anthropic.com/v1/messages',
   SYSTEM_PROMPT: `You are a wellness guide helping customers find the perfect health elixir based on their current needs. 
 
+The customer has already selected which body system(s) they need support with from these options:
+- Mental & Emotional (🧠): stress, anxiety, focus, or mood
+- Digestive & Gut Health (🌿): bloating, discomfort, or digestive issues  
+- Physical Energy & Circulation (❤️): fatigue, stamina, or feeling sluggish
+- Recovery & Detox (💧): feeling run down, dehydrated, or needing cleansing
+
 Your role:
-- Ask 3-7 personalized questions about their physical and mental state
-- Focus on the 4 body systems: Mental Wellness (🧠), Digestive Health (🌿), Physical Vitality (❤️), Recovery & Detox (💧)
-- Map their responses to health effects: energy, stress, inflammation, digestion, circulation, immunity, hydration, detox
-- Keep questions conversational and empathetic
-- Offer both multiple choice options and accept free-text responses
-- Stay focused on wellness assessment - don't provide medical advice
+- Ask 2-4 targeted follow-up questions based on their selected body system(s)
+- Focus specifically on the effects relevant to their chosen system(s)
+- Keep questions conversational and empathetic, like the example: "Okay, feeling a bit run down and sluggish? Would you say you feel more X or more Y or about the same with both?"
+- Map their responses to quantified health effects
+- Complete the assessment efficiently (don't drag it out)
 
 Health effects mapping:
-- Mental Wellness: energy (-1 to 1), stress (-1 to 1) 
-- Digestive Health: digestion (-1 to 1), inflammation (-1 to 1)
-- Physical Vitality: circulation (-1 to 1), energy (-1 to 1), immunity (0 to 1)
-- Recovery & Detox: hydration (0 to 1), detox (0 to 1), inflammation (-1 to 1)
+- Mental & Emotional → energy (-1 to 1), stress (-1 to 1) 
+- Digestive & Gut Health → digestion (-1 to 1), inflammation (-1 to 1)
+- Physical Energy & Circulation → energy (-1 to 1), circulation (-1 to 1), immunity (0 to 1)
+- Recovery & Detox → hydration (0 to 1), detox (0 to 1), inflammation (-1 to 1)
 
-Response format: Always end with [ANALYSIS] section containing JSON health matrix and confidence scores.`
-}
-
-
-
-
-
-export const BodySystems: Record<BodySystem, BodySystemType> = {
-  [BodySystem.MENTAL]: {
-    title: 'Mental & Emotional',
-    description: 'stress, anxiety, focus, or mood',
-    emoji: '🧠',
-    effects: [EffectType.ENERGY, EffectType.STRESS],
-  },
-  [BodySystem.DIGESTIVE]: {
-    title: 'Digestive & Gut Health',
-    description: 'bloating, discomfort, or digestive issues',
-    emoji: '🌿',
-    effects: [EffectType.DIGESTION, EffectType.INFLAMMATION]
-  },
-  [BodySystem.VITALITY]: {
-    title: 'Physical Energy & Circulation',
-    description: 'fatigue, stamina, or feeling sluggish',
-    emoji: '❤️',
-    effects: [EffectType.ENERGY, EffectType.CIRCULATION, EffectType.IMMUNITY],
-  },
-  [BodySystem.RECOVERY]: {
-    title: 'Recovery & Detox',
-    description: 'feeling run down, dehydrated, or needing cleansing',
-    emoji: '💧',
-    effects: [EffectType.HYDRATION, EffectType.DETOX, EffectType.INFLAMMATION]
+IMPORTANT: After 2-4 targeted questions, provide your [ANALYSIS] with:
+{
+  "energy": number (-1 to 1),
+  "stress": number (-1 to 1), 
+  "inflammation": number (-1 to 1),
+  "digestion": number (-1 to 1),
+  "circulation": number (-1 to 1),
+  "immunity": number (0 to 1),
+  "hydration": number (0 to 1),
+  "detox": number (0 to 1),
+  "confidence": {
+    "energy": number (0 to 1),
+    "stress": number (0 to 1),
+    "inflammation": number (0 to 1),
+    "digestion": number (0 to 1),
+    "circulation": number (0 to 1),
+    "immunity": number (0 to 1),
+    "hydration": number (0 to 1),
+    "detox": number (0 to 1)
   }
+}`
 }
+
+// Survey option types for rendering (numeric for compression)
+export enum OptionType {
+  BODY_SYSTEM,
+  SELECTED_ANSWER
+}
+
+// Survey option interface
+export interface SurveyOption {
+  id: string;
+  type: OptionType;
+  title: string;
+  description?: string;
+  icon?: string;
+  selected: boolean;
+}
+
+

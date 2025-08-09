@@ -21,17 +21,17 @@ interface DrinkData {
 const calculateDrinkEffects = (baseIngredients: Ingredient[], boost: Ingredient): [number, number, number, number, number, number, number, number] => {
   const allIngredients = [...baseIngredients, boost];
   const effects: [number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0];
-  
+
   // Sum effects from all ingredients with boost ingredient weighted higher (1.5x)
   allIngredients.forEach((ingredient, index) => {
     const ingredientData = INGREDIENTS[ingredient];
     const weight = ingredient === boost ? 1.5 : 1; // Boost ingredients have higher impact
-    
+
     for (let i = 0; i < 8; i++) {
       effects[i] += ingredientData.effects[i] * weight;
     }
   });
-  
+
   // Normalize by number of ingredients to prevent overwhelming effects from complex formulas
   const normalizer = allIngredients.length * 0.8; // Slight reduction to keep effects reasonable
   return effects.map(effect => Math.round((effect / normalizer) * 100) / 100) as [number, number, number, number, number, number, number, number];
@@ -260,17 +260,17 @@ export const getDrinkEffects = (drinkId: DrinkId): [number, number, number, numb
 
 // Helper function to calculate drink similarity to health matrix
 export const calculateDrinkMatch = (
-  drinkId: DrinkId, 
+  drinkId: DrinkId,
   healthMatrix: [number, number, number, number, number, number, number, number]
 ): number => {
   const drinkEffects = getDrinkEffects(drinkId);
   let similarity = 0;
-  
+
   // Calculate similarity score based on how well drink effects match health needs
   for (let i = 0; i < 8; i++) {
     const need = Math.abs(healthMatrix[i]);
     const provision = Math.abs(drinkEffects[i]);
-    
+
     // If there's a need and the drink provides it, add to similarity
     if (need > 0 && provision > 0) {
       similarity += Math.min(need, provision) * 2; // Bonus for matching needs
@@ -280,6 +280,6 @@ export const calculateDrinkMatch = (
       similarity -= provision * 0.1;
     }
   }
-  
+
   return Math.max(0, similarity); // Ensure non-negative score
 };

@@ -1,35 +1,72 @@
 'use client';
-
 import { useState, useCallback, useRef } from 'react';
-import {
-  calculateDerivedEffects,
-  getOverallConfidence,
-  getPrimaryNeed,
-  CONVERSATION_STARTERS,
-} from '@/data/survey';
-import { DrinkId, SurveyResponse, ConversationResponse, CONFIG, HealthMatrix } from '@/data/enums';
-import { calculateDrinkMatch, DRINKS } from '@/data/drinks';
+import { calculateDerivedEffects } from '@/data/survey';
+import { DrinkId, ConversationResponse, CONFIG, HealthMatrix, BodySystems, SurveyOption, OptionType, WELCOME_QUESTIONS, BodySystemType, WELCOME_TITLES } from '@/data/enums';
+import { calculateDrinkMatch } from '@/data/drinks';
+import _ from 'lodash'
+
 
 interface UseSurveyReturn {
-  // State
   currentQuestion: string;
-  conversation: ConversationResponse[];
-  healthMatrix: HealthMatrix | null;
-  recommendedDrink: DrinkId | null;
+  currentTitle: string,
+  currentOptions: SurveyOption[];
+  sortedDrinks: DrinkId[] | null;
   isLoading: boolean;
   error: string | null;
-  conversationComplete: boolean;
-  sessionStarted: boolean;
-
-  // Actions
-  startSurvey: () => void;
-  submitResponse: (response: string, isMultipleChoice?: boolean) => Promise<void>;
+  toggleCurrentOptionSelect: (optionId: string) => void;
+  setCurrentTextResponse: (text: string) => void;
+  submitResponse: () => void;
   resetSurvey: () => void;
 }
 
+
+
+
+function startQuestion() {
+  return WELCOME_QUESTIONS[Math.floor(Math.random() * WELCOME_QUESTIONS.length)]
+}
+
+
+
+
+
+function startOptions(): SurveyOption[] {
+  return Object.keys(BodySystems).map((key: any) => {
+
+
+    const bodySystem = BodySystems[key] as BodySystemType
+
+    return {
+      id: key,
+      type: OptionType.BODY_SYSTEM,
+      title: bodySystem.title,
+      description: bodySystem.description,
+      icon: bodySystem.emoji,
+      selected: false
+    }
+  })
+
+}
+
+function startTitle() {
+  return WELCOME_TITLES[Math.floor(Math.random() * WELCOME_TITLES.length)]
+}
+
+
+
+
+
+
 export function useSurvey(): UseSurveyReturn {
   // State
-  const [currentQuestion, setCurrentQuestion] = useState<string>('');
+
+
+  const [currentQuestion, setCurrentQuestion] = useState<string>(startQuestion);
+  const [currentOptions, setCurrentOptions] = useState<SurveyOption[]>(startOptions)
+  const [currentTitle, setCurrentTitle] = useState<string>(startTitle)
+  const [tsextResponse, setTextResponse] = useState<string>('')
+
+
   const [conversation, setConversation] = useState<ConversationResponse[]>([]);
   const [healthMatrix, setHealthMatrix] = useState<HealthMatrix | null>(null);
   const [recommendedDrink, setRecommendedDrink] = useState<DrinkId | null>(null);
@@ -37,6 +74,24 @@ export function useSurvey(): UseSurveyReturn {
   const [error, setError] = useState<string | null>(null);
   const [conversationComplete, setConversationComplete] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+
+  const [sortedDrinks, setSortedDrinks] = useState([])
+
+  const toggleCurrentOptionSelect = (id: string) => {
+    const i = _.findIndex(currentOptions, { id })
+
+    currentOptions[i] = {
+      ...currentOptions[i],
+      selected: !currentOptions[i].selected
+    }
+
+    setCurrentOptions(currentOptions.concat([]))
+  }
+
+
+  const setCurrentTextResponse = (text: string) => {
+
+  }
 
   // Refs
   const sessionId = useRef<string>('');
@@ -127,22 +182,8 @@ export function useSurvey(): UseSurveyReturn {
     return drinkScores[0].drinkId;
   };
 
-  // Start survey
-  const startSurvey = useCallback(() => {
-    sessionId.current = `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    startTime.current = Date.now();
-    setSessionStarted(true);
-    setError(null);
-
-    const welcomeMessage = CONVERSATION_STARTERS.welcome[
-      Math.floor(Math.random() * CONVERSATION_STARTERS.welcome.length)
-    ];
-
-    setCurrentQuestion(welcomeMessage);
-  }, []);
-
   // Submit response
-  const submitResponse = useCallback(async (response: string, isMultipleChoice = false) => {
+  const submitResponse = useCallback(async () => {
     if (!sessionStarted || conversationComplete) return;
 
     setIsLoading(true);
@@ -218,19 +259,16 @@ export function useSurvey(): UseSurveyReturn {
   }, []);
 
   return {
-    // State
     currentQuestion,
-    conversation,
-    healthMatrix,
-    recommendedDrink,
+    currentOptions,
+    currentTitle,
+    sortedDrinks,
     isLoading,
     error,
-    conversationComplete,
-    sessionStarted,
-
-    // Actions
-    startSurvey,
-    submitResponse,
+    toggleCurrentOptionSelect,
+    setCurrentTextResponse,
     resetSurvey,
+    submitResponse
+
   };
 }
