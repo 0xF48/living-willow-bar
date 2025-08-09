@@ -1,0 +1,4 @@
+- the server is responsible for checking availability of ingredients and completing active orders and giving coaster to customers that have the qr code and order number.
+- the customer will scan a QR code on coaster to redirect to a unique survey page url that is unique to their table or spot that will notify the server of the location of the customer via a number on the QR code.
+- a session will be created once a user navigates to the QR code. only one session may be active at a time per coaster.
+- a list of active coaster sessions and their orders will be visible to the server in the ServerView.

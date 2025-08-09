@@ -1,0 +1,1 @@
+admin dashboard will display total orders for the day and peak times and popularity of different drinks.

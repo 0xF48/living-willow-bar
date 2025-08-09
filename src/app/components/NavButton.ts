@@ -1,0 +1,1 @@
+//the nav button is the bas component for all the hovering view navigation buttons in the app.
