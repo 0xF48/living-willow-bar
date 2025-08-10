@@ -1,7 +1,9 @@
 export enum CONFIG {
   SURVEY_MAX_QUESTIONS = 7,  // Maximum questions per session (default: 7)
   SURVEY_MAX_DURATION = 5000,
-  SURVEY_MIN_CONFIDENCE = 0.6
+  SURVEY_MIN_CONFIDENCE = 0.6,
+  ROUNDED = 'rounded-2xl',
+  BUTTON_STYLE = CONFIG.ROUNDED + ' hover:ring-3 flex items-center justify-center gap-2 transition-shadow p-4 px-6 cursor-pointer'
 }
 
 export const WELCOME_QUESTIONS = [

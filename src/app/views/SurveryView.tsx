@@ -1,6 +1,6 @@
 'use client';
 
-import { OptionType, SurveyOption } from '@/data/enums';
+import { CONFIG, OptionType, SurveyOption } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
 import cn from 'classnames'
 import { ArrowBigRightDashIcon, MessageCircleHeartIcon } from 'lucide-react';
@@ -13,7 +13,8 @@ function SubmitAnswerButton({ onSubmit }: { onSubmit: any }) {
 
   return <button onClick={onSubmit} className={
     cn(
-      'bg-black text-white font-bold rounded-2xl p-4 cursor-pointer flex items-center justify-center gap-2'
+      CONFIG.BUTTON_STYLE,
+      'bg-black text-white  ring-black/20 font-bold '
     )
   }>
     <ArrowBigRightDashIcon />
@@ -22,7 +23,7 @@ function SubmitAnswerButton({ onSubmit }: { onSubmit: any }) {
 }
 
 
-const TEXT_ANSWER_BUTTON_RELATIVE_POS = 'relative w-[14em] h-14'
+const TEXT_ANSWER_BUTTON_RELATIVE_POS = 'relative w-full h-14'
 const TEXT_ANSWER_BUTTON_FIXED_POS = 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem]'
 
 
@@ -44,13 +45,13 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
     position = TEXT_ANSWER_BUTTON_RELATIVE_POS
     content = <div
       onClick={() => { setTextResponseOpen(true) }}
-      className="font-bold rounded-2xl p-4 w-full cursor-pointer flex items-center justify-center gap-2 pointer-events-auto">
+      className={cn(CONFIG.BUTTON_STYLE, 'bg-slate-50 ring-slate-200 font-bold ')}>
       <MessageCircleHeartIcon /> custom
     </div>
   } else {
     position = TEXT_ANSWER_BUTTON_FIXED_POS
     content = <div
-      className="w-full h-full flex items-start flex-col font-display text-black  bg-white">
+      className="w-full h-full flex items-start flex-col font-display text-black  bg-white p-10">
       <div>{currentQuestion}</div>
       <textarea className='' placeholder='your response'>
 
@@ -70,11 +71,11 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
       <div
         onClick={() => { setTextResponseOpen(false) }}
         className={
-          cn("z-10 w-full h-full fixed transition-opacity duration-200 left-0 top-0 bg-gray-100/90 backdrop-blur-xl",
+          cn("z-10 w-full h-full fixed transition-opacity duration-200 left-0 top-0 bg-slate-100/90 backdrop-blur-xl",
             textResponseOpen ? ' opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')} ></div >, document.body)}
     <MotionBox
       classNames={{
-        style: cn(textResponseOpen ? 'bg-white ' : 'bg-gray-100 hover:ring hover:ring-3 ring-gray-200 cursor-pointer ', 'transition-colors rounded-2xl z-40'),
+        style: 'z-40 ' + CONFIG.ROUNDED,
         position: position
       }}>
       {content}
@@ -86,8 +87,9 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
 
 function SelectableOption({ selected, children, onSelect }: { selected: boolean, children: any, onSelect: any }) {
   return <button onClick={onSelect} className={cn(
-    'bg-slate-100 rounded-2xl p-4 hover:outline-4 hover:cursor-pointer flex flex-row',
-    selected ? 'outline-blue-400 outline-4' : 'outline-slate-300'
+    CONFIG.BUTTON_STYLE,
+    'flex-row items-center justify-start hover:ring-3 transition-colors',
+    selected ? 'ring-yellow-400 ring-3 bg-yellow-200' : 'ring-slate-200 bg-slate-50'
   )} >{children}</button>
 }
 
