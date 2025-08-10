@@ -67,6 +67,11 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
 
   const [textResponse, setTextResponse] = useState('')
   const [textResponseOpen, setTextResponseOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const handleSave = () => {
     onSubmit(textResponse)
@@ -136,7 +141,7 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
   }
 
   return <>
-    {createPortal(
+    {isMounted && createPortal(
       <div
         onClick={() => { setTextResponseOpen(false) }}
         className={

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Nav, DrinkId, CONFIG } from '@/data/enums';
 
 export interface DrinkRanking {
@@ -33,11 +33,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     matchCount: 0
   });
 
-  const setCurrentView = (view: Nav) => {
+  const setCurrentView = useCallback((view: Nav) => {
     setState(prev => ({ ...prev, currentView: view }));
-  };
+  }, []);
 
-  const updateDrinkRankings = (rankings: DrinkRanking[]) => {
+  const updateDrinkRankings = useCallback((rankings: DrinkRanking[]) => {
     const topMatch = rankings.length > 0 ? rankings[0] : null;
     const matchCount = rankings.filter(r => r.score >= CONFIG.DRINK_MATCH_THRESHOLD).length;
     
@@ -47,11 +47,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       topMatch,
       matchCount
     }));
-  };
+  }, []);
 
-  const setHasHealthMatrix = (hasMatrix: boolean) => {
+  const setHasHealthMatrix = useCallback((hasMatrix: boolean) => {
     setState(prev => ({ ...prev, hasHealthMatrix: hasMatrix }));
-  };
+  }, []);
 
   return (
     <AppContext.Provider

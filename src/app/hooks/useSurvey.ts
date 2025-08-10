@@ -1,9 +1,29 @@
 'use client';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { calculateDerivedEffects, buildSystemPrompt } from '@/data/survey';
 import { DrinkId, ConversationResponse, CONFIG, HealthMatrix, BodySystems, SurveyOption, OptionType, WELCOME_QUESTIONS, BodySystemType, WELCOME_TITLES, BODY_SYSTEM_MATRIX_MAPPING, BodySystem, AI_CONFIG } from '@/data/enums';
 import { calculateDrinkMatch, DRINKS } from '@/data/drinks';
 import _ from 'lodash'
+
+// Global state to persist across component unmounts/remounts
+let persistedSurveyState: {
+  currentQuestion: string;
+  currentOptions: SurveyOption[];
+  currentTitle: string;
+  textResponse: string;
+  conversation: ConversationResponse[];
+  healthMatrix: HealthMatrix | null;
+  accumulatedMatrix: HealthMatrix | null;
+  recommendedDrink: DrinkId | null;
+  isLoading: boolean;
+  error: string | null;
+  conversationComplete: boolean;
+  sessionStarted: boolean;
+  sortedDrinks: { drinkId: DrinkId, score: number }[];
+  aiMessages: Array<{ role: 'user' | 'assistant', content: string }>;
+  sessionId: string;
+  startTime: number;
+} | null = null;
 
 
 interface UseSurveyReturn {
@@ -26,7 +46,7 @@ interface UseSurveyReturn {
 
 
 function startQuestion() {
-  return WELCOME_QUESTIONS[Math.floor(Math.random() * WELCOME_QUESTIONS.length)]
+  return WELCOME_QUESTIONS[0] // Use first question to avoid hydration mismatch
 }
 
 
@@ -36,7 +56,7 @@ function startQuestion() {
 function startOptions(): SurveyOption[] {
   return Object.keys(BodySystems).map((key: any) => {
 
-
+    //@ts-ignore
     const bodySystem = BodySystems[key] as BodySystemType
 
     return {
@@ -52,7 +72,7 @@ function startOptions(): SurveyOption[] {
 }
 
 function startTitle() {
-  return WELCOME_TITLES[Math.floor(Math.random() * WELCOME_TITLES.length)]
+  return WELCOME_TITLES[0] // Use first title to avoid hydration mismatch
 }
 
 
@@ -61,25 +81,61 @@ function startTitle() {
 
 
 export function useSurvey(): UseSurveyReturn {
-  // State
+  // Initialize state from persisted state or defaults
+  const [currentQuestion, setCurrentQuestion] = useState<string>(() =>
+    persistedSurveyState?.currentQuestion ?? startQuestion());
+  const [currentOptions, setCurrentOptions] = useState<SurveyOption[]>(() =>
+    persistedSurveyState?.currentOptions ?? startOptions())
+  const [currentTitle, setCurrentTitle] = useState<string>(() =>
+    persistedSurveyState?.currentTitle ?? startTitle())
+  const [textResponse, setTextResponse] = useState<string>(() =>
+    persistedSurveyState?.textResponse ?? '')
 
-
-  const [currentQuestion, setCurrentQuestion] = useState<string>(startQuestion);
-  const [currentOptions, setCurrentOptions] = useState<SurveyOption[]>(startOptions)
-  const [currentTitle, setCurrentTitle] = useState<string>(startTitle)
-  const [textResponse, setTextResponse] = useState<string>('')
-
-
-  const [conversation, setConversation] = useState<ConversationResponse[]>([]);
-  const [healthMatrix, setHealthMatrix] = useState<HealthMatrix | null>(null);
-  const [accumulatedMatrix, setAccumulatedMatrix] = useState<HealthMatrix | null>(null);
-  const [recommendedDrink, setRecommendedDrink] = useState<DrinkId | null>(null);
+  const [conversation, setConversation] = useState<ConversationResponse[]>(() =>
+    persistedSurveyState?.conversation ?? []);
+  const [healthMatrix, setHealthMatrix] = useState<HealthMatrix | null>(() =>
+    persistedSurveyState?.healthMatrix ?? null);
+  const [accumulatedMatrix, setAccumulatedMatrix] = useState<HealthMatrix | null>(() =>
+    persistedSurveyState?.accumulatedMatrix ?? null);
+  const [recommendedDrink, setRecommendedDrink] = useState<DrinkId | null>(() =>
+    persistedSurveyState?.recommendedDrink ?? null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [conversationComplete, setConversationComplete] = useState(false);
-  const [sessionStarted, setSessionStarted] = useState(false);
+  const [error, setError] = useState<string | null>(() =>
+    persistedSurveyState?.error ?? null);
+  const [conversationComplete, setConversationComplete] = useState(() =>
+    persistedSurveyState?.conversationComplete ?? false);
+  const [sessionStarted, setSessionStarted] = useState(() =>
+    persistedSurveyState?.sessionStarted ?? false);
 
-  const [sortedDrinks, setSortedDrinks] = useState<{ drinkId: DrinkId, score: number }[]>([])
+  const [sortedDrinks, setSortedDrinks] = useState<{ drinkId: DrinkId, score: number }[]>(() =>
+    persistedSurveyState?.sortedDrinks ?? [])
+
+  // Refs
+  const sessionId = useRef<string>(persistedSurveyState?.sessionId ?? '');
+  const startTime = useRef<number>(persistedSurveyState?.startTime ?? 0);
+  const aiMessages = useRef<Array<{ role: 'user' | 'assistant', content: string }>>(persistedSurveyState?.aiMessages ?? []);
+
+  // Persist state changes
+  useEffect(() => {
+    persistedSurveyState = {
+      currentQuestion,
+      currentOptions,
+      currentTitle,
+      textResponse,
+      conversation,
+      healthMatrix,
+      accumulatedMatrix,
+      recommendedDrink,
+      isLoading,
+      error,
+      conversationComplete,
+      sessionStarted,
+      sortedDrinks,
+      aiMessages: aiMessages.current,
+      sessionId: sessionId.current,
+      startTime: startTime.current,
+    };
+  }, [currentQuestion, currentOptions, currentTitle, textResponse, conversation, healthMatrix, accumulatedMatrix, recommendedDrink, isLoading, error, conversationComplete, sessionStarted, sortedDrinks]);
 
   const toggleCurrentOptionSelect = (id: string) => {
     const i = _.findIndex(currentOptions, { id })
@@ -97,10 +153,6 @@ export function useSurvey(): UseSurveyReturn {
     setTextResponse(text)
   }
 
-  // Refs
-  const sessionId = useRef<string>('');
-  const startTime = useRef<number>(0);
-  const aiMessages = useRef<Array<{ role: 'user' | 'assistant', content: string }>>([]);
 
   // Call Claude API through Next.js API route
   const callClaudeAPI = async (messages: any[], systemPrompt: string): Promise<string> => {
@@ -340,15 +392,23 @@ export function useSurvey(): UseSurveyReturn {
 
   // Reset survey
   const resetSurvey = useCallback(() => {
-    setCurrentQuestion('');
+    setCurrentQuestion(startQuestion());
+    setCurrentOptions(startOptions());
+    setCurrentTitle(startTitle());
+    setTextResponse('');
     setConversation([]);
     setHealthMatrix(null);
+    setAccumulatedMatrix(null);
     setRecommendedDrink(null);
     setError(null);
     setConversationComplete(false);
     setSessionStarted(false);
+    setSortedDrinks([]);
     sessionId.current = '';
     startTime.current = 0;
+    aiMessages.current = [];
+    // Clear persisted state
+    persistedSurveyState = null;
   }, []);
 
   return {

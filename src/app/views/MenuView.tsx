@@ -4,79 +4,92 @@ import { useApp } from '../context/AppContext';
 import { DrinkData, DRINKS, getDrink } from '@/data/drinks';
 import { DrinkId, STYLE, Nav, CONFIG } from '@/data/enums';
 import cn from 'classnames';
-import { MessageCircleHeartIcon } from 'lucide-react';
+import { CarrotIcon, MessageCircleHeartIcon, RainbowIcon, ZapIcon } from 'lucide-react';
 
 
-function MatchBadge({ matchScore }: { matchScore: number }) {
-  return <div className="flex justify-between items-start mb-3">
-    <div className="text-3xl">{drink.emoji}</div>
+function MatchBadge({ matchScore, isMatch }: { matchScore: number, isMatch: boolean }) {
+  // Map match score (0-1) to HSL hue (0° red to 60° yellow to 120° green)
+  const hue = matchScore * 120;
+  // Darken the background by reducing lightness
+  const backgroundColor = `hsl(${hue}, 70%, 35%)`;
+  
+  return <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30">
     <div
-      className={cn(
-        'px-3 py-1 rounded-full text-xs font-bold',
-        isMatch
-          ? 'bg-green-500 text-white'
-          : 'bg-gray-600 text-gray-300'
-      )}
+      className="px-3 py-1 rounded-full text-xs font-bold text-white whitespace-nowrap"
+      style={{ backgroundColor }}
     >
       {Math.round(matchScore * 100)}% match
     </div>
   </div>
 }
 
-function MenuDrinkCard({ matchScore, drinkId, drink }: { matchScore: number | null, drinkId: DrinkId, drink: DrinkData }) {
+function MenuDrinkCard({ matchScore, drinkId, drink, index }: { matchScore: number | null, drinkId: DrinkId, drink: DrinkData, index: number }) {
   const hasMatch = matchScore !== null
+  
+  // Calculate the same color as the match badge
+  const hue = matchScore !== null ? matchScore * 120 : 0;
+  const indexColor = matchScore !== null ? `hsl(${hue}, 70%, 35%)` : '#374151'; // gray-700 as fallback
 
   return <div
     className={cn(
-      'relative rounded-2xl p-6 transition-all overflow-hidden ring-slate-800 ring-4 cursor-pointer hover:ring-slate-700',
+      'relative flex bg-black',
     )}
-    style={{
-      backgroundImage: `url(${drink.imageSrc})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }}
   >
-    {/* Gradient Overlay - transparent left to full transparency right */}
-    <div className="absolute inset-0 bg-gradient-to-l from-slate-900 via-slate-900/90 to-slate-900/60"></div>
+    {/* Index Number */}
+    <div className="absolute -left-10 top-20 z-20">
+      <span className="text-2xl font-bold" style={{ color: indexColor }}>{index}.</span>
+    </div>
 
-    {/* Content */}
-    <div className="relative z-10">
-      {/* Match Badge */}
+    {/* Background Image - 1/3 of container */}
+    <div
+      className="w-1/3 h-full rounded-2xl relative"
+      style={{
+        backgroundImage: `url(${drink.imageSrc})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        aspectRatio: '3/4'
+      }}
+    >
+      {/* Gradient overlay on image */}
+      <div className="w-full h-full bg-gradient-to-b from-transparent to-black rounded-2xl"></div>
+      
+      {/* Match Badge positioned relative to image */}
       {matchScore !== null && (
-        <MatchBadge matchScore={matchScore} />
+        <MatchBadge matchScore={matchScore} isMatch={matchScore >= CONFIG.DRINK_MATCH_THRESHOLD} />
       )}
+    </div>
 
-      {!matchScore && (
-        <div className="text-3xl mb-3">{drink.emoji}</div>
-      )}
+    {/* Content - 2/3 of container */}
+    <div className="w-2/3 pl-6 relative">
 
       {/* Drink Info */}
-      <h3 className="text-xl font-bold text-white mb-2">
+      <h3 className="text-3xl font-bold text-white mb-5">
         {drink.name}
       </h3>
 
       <div className="space-y-3">
-
-
         <div>
-          <div className="text-sm font-semibold text-slate-300 mb-1">
+          <div className="text-sm font-semibold text-green-300 mb-1 flex flex-row gap-2 items-center">
+            <RainbowIcon className='w-5' />
             Flavor
           </div>
-          <p className="text-sm text-slate-400">{drink.flavorProfile}</p>
+          <p className="text-sm text-gray-400">{drink.flavorProfile}</p>
         </div>
 
         <div>
-          <div className="text-sm font-semibold text-slate-300 mb-1">
+          <div className="text-sm font-semibold text-orange-300 mb-1 flex flex-row gap-2 items-center">
+            <CarrotIcon className='w-5' />
             Ingredients
           </div>
-          <p className="text-sm text-slate-400">{drink.baseDrink}</p>
+          <p className="text-sm text-gray-400">{drink.baseDrink}</p>
         </div>
 
         <div>
-          <div className="text-sm font-semibold text-slate-300 mb-1">
+          <div className="text-sm font-semibold text-yellow-300 mb-1 flex flex-row gap-2 items-center">
+            <ZapIcon className='w-5' />
             Effects
           </div>
-          <p className="text-sm text-slate-400">{drink.effects}</p>
+          <p className="text-sm text-gray-400">{drink.effects}</p>
         </div>
       </div>
     </div>
@@ -105,7 +118,7 @@ export function MenuView() {
     return score !== null && score >= CONFIG.DRINK_MATCH_THRESHOLD;
   };
 
-  return <div className="w-full min-h-screen bg-black text-white">
+  return <div className="w-full min-h-screen bg-black text-white ">
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8 text-center">
@@ -120,12 +133,19 @@ export function MenuView() {
       </div>
 
       {/* Drinks Grid */}
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mb-8">
-        {sortedDrinks.map((drinkId) => {
+      <div className="flex flex-col mb-8 max-w-lg w-full mx-auto">
+        {sortedDrinks.map((drinkId, index) => {
           const drink = getDrink(drinkId);
           const matchScore = getMatchScore(drinkId);
 
-          return <MenuDrinkCard key={drinkId} drinkId={drinkId} drink={drink} matchScore={matchScore} />
+          return (
+            <div key={drinkId}>
+              <MenuDrinkCard drinkId={drinkId} drink={drink} matchScore={matchScore} index={index + 1} />
+              {index < sortedDrinks.length - 1 && (
+                <div className="w-30 h-1 bg-gray-800 rounded-full mx-auto my-8"></div>
+              )}
+            </div>
+          )
 
         })
         }
