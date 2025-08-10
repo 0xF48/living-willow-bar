@@ -1,11 +1,12 @@
 import { DrinkView } from '../../../views/DrinkView';
 
 interface DrinkPageProps {
-  params: {
+  params: Promise<{
     drinkId: string;
-  };
+  }>;
 }
 
-export default function DrinkPage({ params }: DrinkPageProps) {
-  return <DrinkView drinkId={params.drinkId} />
+export default async function DrinkPage({ params }: DrinkPageProps) {
+  const { drinkId } = await params;
+  return <DrinkView drinkId={drinkId} />
 }

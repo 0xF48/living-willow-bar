@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback, useRef, createContext, ReactNode, useContext } from 'react';
+import { useState, useCallback, useRef, createContext, ReactNode, useContext, useEffect } from 'react';
 import { buildSystemPrompt } from '@/data/survey';
 import { DrinkId, ConversationResponse, CONFIG, HealthMatrix, BodySystems, SurveyOption, OptionType, BodySystemType, ENTRY_HEADERS, ENTRY_PROMPTS } from '@/data/enums';
 import { calculateDrinkMatch, DrinkData, DRINKS, getDrink } from '@/data/drinks';
@@ -29,7 +29,8 @@ export interface AIResponseDataType {
 
 
 
-function entryForm(): SurveyForm {
+// Create entry form with random prompts
+function createEntryForm(): SurveyForm {
   return {
     header: randomItem(ENTRY_HEADERS),
     prompt: randomItem(ENTRY_PROMPTS),
@@ -45,7 +46,12 @@ function entryForm(): SurveyForm {
   }
 }
 
-const ENTRY_FORM = entryForm()
+// Empty initial form for SSR to prevent hydration mismatch
+const EMPTY_ENTRY_FORM: SurveyForm = {
+  header: '',
+  prompt: '',
+  options: []
+}
 export type DrinkRanking = { drinkId: DrinkId, score: number }
 
 // Rank all drinks based on accumulated health matrix
@@ -147,7 +153,7 @@ const validateHealthMatrix = (matrix: any): matrix is HealthMatrix => {
 
 
 function formatResponseListIntoMessages(responseList: SurveyResponse[]): any[] {
-  let messages: any[] = []
+  const messages: any[] = []
   responseList.forEach(({ response, prompt }) => {
     messages.push({
       role: "assistant",
@@ -168,7 +174,14 @@ export function useSurveyInternal(): UseSurveyReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [responseList, setResponseList] = useState<SurveyResponse[]>([])
-  const [currentForm, setCurrentForm] = useState<SurveyForm>(ENTRY_FORM)
+  const [currentForm, setCurrentForm] = useState<SurveyForm>(EMPTY_ENTRY_FORM)
+
+  // Set random entry form after hydration to avoid SSR mismatch
+  useEffect(() => {
+    if (responseList.length === 0) {
+      setCurrentForm(createEntryForm()) // Use random on client side
+    }
+  }, []) // Empty dependency array - only run once after mount
 
 
   const submitForm = useCallback(async (response: SurveyResponse) => {
@@ -205,6 +218,9 @@ export function useSurveyInternal(): UseSurveyReturn {
 
       // Parse JSON response with error handling
       let aiResponse: AIResponseDataType
+      console.log('=== AI OUTPUT TEXT ===');
+      console.log(aiResponseText)
+      console.log('======================');
       try {
         aiResponse = JSON.parse(aiResponseText);
         console.log('=== AI OUTPUT JSON ===');
@@ -247,7 +263,7 @@ export function useSurveyInternal(): UseSurveyReturn {
   // Reset survey
   const resetSurvey = useCallback(() => {
     setHealthMatrix(null);
-    setCurrentForm(ENTRY_FORM);
+    setCurrentForm(createEntryForm()); // Use random form when resetting
     setError(null);
     setResponseList([])
   }, []);

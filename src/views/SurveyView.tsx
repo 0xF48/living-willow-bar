@@ -219,7 +219,7 @@ export function SurveyView() {
   }
 
   function toggleOptionSelect(index: number) {
-    let new_selected = _clone(selected)
+    const new_selected = _clone(selected)
     new_selected[index] = !!!new_selected[index]
     setSelected(new_selected)
   }
@@ -230,6 +230,17 @@ export function SurveyView() {
     return v === true
   }).length == 0
 
+  // Don't render anything until the form is loaded (prevents hydration mismatch)
+  if (!currentForm.header || !currentForm.prompt) {
+    return <>
+      <div className='w-full h-auto mt-20 flex flex-col justify-center max-w-lg mx-auto gap-8 px-4 pb-24' >
+        <div className='w-full text-center text-sm text-gray-500'>
+          Loading...
+        </div>
+      </div>
+      <SurveyNavBar />
+    </>
+  }
 
   return <>
     <div className='w-full h-auto mt-20 flex flex-col justify-center max-w-lg mx-auto gap-8 px-4 pb-24' >
@@ -253,7 +264,7 @@ export function SurveyView() {
         return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />
       })}
 
-      {!currentForm.options ? (
+      {!currentForm.options.length ? (
         <div className='w-full text-center text-green-600 font-bold'>
           Assessment complete! Your recommendation is ready.
         </div>
