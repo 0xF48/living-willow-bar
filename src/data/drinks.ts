@@ -2,9 +2,10 @@ import { DrinkId, Ingredient, BodySystem } from './enums';
 import { INGREDIENTS } from './ingredients';
 
 // Drink data interface
-interface DrinkData {
+export interface DrinkData {
   name: string;
   emoji: string;
+  imageSrc: string;
   baseDrink: string;
   flavorProfile: string;
   effects: string;
@@ -41,6 +42,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.SPIRIT_CACAO]: {
     name: "Spirit Cacao",
     emoji: "🫘",
+    imageSrc: "/drinks/spirit-cacao.jpg",
     baseDrink: "Cacao melted in warmed oat milk, whisked with chiltepín, annatto, allspice, vanilla, piloncillo and a pinch of Mayan sun salt.",
     flavorProfile: "Rich, warming chocolate with subtle spice and natural sweetness",
     effects: "Elevates mood and promotes immunity. Allspice's eugenol provides anti-inflammatory and digestive benefits. Piloncillo helps stabilize blood sugar better than refined sweeteners.",
@@ -67,6 +69,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.MOUNTAIN_LEAF_ELIXIR]: {
     name: "Mountain Leaf Elixir",
     emoji: "🍋",
+    imageSrc: "/drinks/mountain-leaf-elixir.jpg",
     baseDrink: "Yerba maté steeped with lemongrass and citrus peel, lightly sweetened with agave and finished with Bolivian rose salt.",
     flavorProfile: "Crisp and citrusy with grassy undertones, balanced bitterness with zesty lift",
     effects: "Provides clean, focused energy boost with refreshing mental lift",
@@ -89,6 +92,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.BAOBAB_VITAL_BREW]: {
     name: "Baobab Vital Brew",
     emoji: "🥭",
+    imageSrc: "/drinks/baobab-vital-brew.jpg",
     baseDrink: "Baobab blended with tamarind, fresh lemon juice, coconut water, and grated ginger.",
     flavorProfile: "Tangy and tropical with tamarind sourness and ginger heat - bold and bright",
     effects: "Revitalizes with vitamin C and electrolytes, supporting hydration and immunity",
@@ -111,6 +115,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
 
   [DrinkId.STEPPE_ROOT_BREW]: {
     name: "Steppe Root Brew",
+    imageSrc: "/drinks/steppe-root-brew.jpg",
     emoji: "🍒",
     baseDrink: "Fermented beet kvass mixed with schizandra berry, rhodiola, and tart cherry.",
     flavorProfile: "Earthy, tangy, and slightly fizzy with wild berry finish",
@@ -134,6 +139,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.FOREST_PANDAN_FIZZ]: {
     name: "Forest Pandan Fizz",
     emoji: "🎋",
+    imageSrc: "/drinks/forest-pandan-fizz.jpg",
     baseDrink: "Pandan leaf, jasmine flower, and lemongrass steeped, mixed with coconut water and ginger fizz. Finished with Sri Lankan black salt.",
     flavorProfile: "Light, floral, and bubbly with pandan and jasmine balanced by ginger sparkle",
     effects: "Uplifts mood with calming florals and gentle digestive support",
@@ -158,6 +164,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.JADE_MIST_INFUSION]: {
     name: "Jade Mist Infusion",
     emoji: "🍈",
+    imageSrc: "/drinks/jade-mist-infusion.jpg",
     baseDrink: "Green tea infused with chrysanthemum, hawthorn berries, and lime zest.",
     flavorProfile: "Grassy tea base uplifted by floral and citrus accents",
     effects: "Enhances alertness and longevity while gently detoxifying and hydrating",
@@ -180,6 +187,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.ASPEN_GROVE_TONIC]: {
     name: "Aspen Grove Tonic",
     emoji: "🌳",
+    imageSrc: "/drinks/aspen-grove-tonic.jpg",
     baseDrink: "Aspen bark tea infused with lingonberry, juniper berries, nettle, and spruce tips.",
     flavorProfile: "Crisp, lightly bitter, and forest-fresh - evokes snowmelt streams through alpine groves",
     effects: "Gently eases inflammation, stimulates circulation, and supports detox",
@@ -203,6 +211,7 @@ const DRINKS_BASE: Record<DrinkId, Omit<DrinkData, 'effectsMatrix'>> = {
   [DrinkId.DESERT_BLOOM_TISANE]: {
     name: "Desert Bloom Tisane",
     emoji: "🍃",
+    imageSrc: "/drinks/desert-bloom-tisane.jpg",
     baseDrink: "Peppermint, licorice root, rose petals, and fennel seed steeped in mineral water.",
     flavorProfile: "Cooling and fragrant with sweet licorice and fresh mint over delicate herbal base",
     effects: "Calms digestion and nervous system while gently hydrating and cooling",

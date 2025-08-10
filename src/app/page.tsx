@@ -1,9 +1,10 @@
-import { SurveyView } from './views/SurveyView';
+import { AppProvider } from './context/AppContext';
+import { AppShell } from './components/AppShell';
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <SurveyView />
-    </div>
+    <AppProvider>
+      <AppShell />
+    </AppProvider>
   );
 }

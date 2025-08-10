@@ -3,6 +3,8 @@
 import { CONFIG, OptionType, SurveyOption, STYLE } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
 import { getDrink } from '@/data/drinks';
+import { useApp } from '../context/AppContext';
+import { SurveyNavButton } from '../components/SurveyNavButton';
 import cn from 'classnames'
 import { ArrowBigRightDashIcon, MessageCircleHeartIcon, ArrowRight, X, Loader } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -177,11 +179,20 @@ export function SurveyView() {
 
   const [customTextResponse, setCustomTextResponse] = useState('')
   const { toggleCurrentOptionSelect, currentQuestion, currentTitle, currentOptions, submitResponse, setCurrentTextResponse, isLoading, conversation, conversationComplete, sortedDrinks, recommendedDrink } = useSurvey()
+  const { updateDrinkRankings, setHasHealthMatrix } = useApp()
 
   // Clear custom text when a new question is received
   useEffect(() => {
     setCustomTextResponse('')
   }, [currentQuestion])
+
+  // Update app context when drink rankings change
+  useEffect(() => {
+    if (sortedDrinks.length > 0) {
+      updateDrinkRankings(sortedDrinks)
+      setHasHealthMatrix(true)
+    }
+  }, [sortedDrinks, updateDrinkRankings, setHasHealthMatrix])
 
   // Check if there are any selected options
   const hasSelectedOptions = currentOptions.some(option => option.selected)
@@ -205,7 +216,8 @@ export function SurveyView() {
 
 
 
-  return <div className='w-full h-auto mt-20 flex flex-col justify-center max-w-lg mx-auto gap-8 px-4' >
+  return <>
+    <div className='w-full h-auto mt-20 flex flex-col justify-center max-w-lg mx-auto gap-8 px-4 pb-24' >
 
     {/* Progress indicator */}
     {conversation.length > 0 && (
@@ -283,5 +295,9 @@ export function SurveyView() {
 
 
 
-  </div>
+    </div>
+
+    {/* Survey Navigation Button */}
+    <SurveyNavButton />
+  </>
 }

@@ -2,6 +2,7 @@ export enum CONFIG {
   SURVEY_MAX_QUESTIONS = 7,  // Maximum questions per session (default: 7)
   SURVEY_MAX_DURATION = 300000, // 5 minutes in milliseconds
   SURVEY_MIN_CONFIDENCE = 0.6,
+  DRINK_MATCH_THRESHOLD = 0.3, // Minimum score to show as match
   ROUNDED = 'rounded-2xl'
 }
 
@@ -11,7 +12,7 @@ export enum STYLE {
   BUTTON_ENABLED = 'cursor-pointer',
   BUTTON_LOADING = 'bg-gray-400 text-white cursor-wait !ring-0',
   BLACK = STYLE.BUTTON_ENABLED + ' bg-black text-white ring-black/20 hover:ring-black/30',
-  SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-slate-200',
+  SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-slate-200 text-black',
   BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white hover:ring-blue-200',
   ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-white hover:ring-red-200',
   YELLOW = STYLE.BUTTON_ENABLED + ' ring-yellow-400 ring-3 bg-yellow-200'
