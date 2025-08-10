@@ -3,7 +3,7 @@
 import { CONFIG, OptionType, SurveyOption, STYLE } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
 import { useApp } from '../context/AppContext';
-import { SurveyNavButton } from '../components/SurveyNavButton';
+import { SurveyNavBar } from '../components/SurveyNavBar';
 import cn from 'classnames'
 import { ArrowBigRightDashIcon, MessageCircleHeartIcon, ArrowRight, X, Loader, XIcon } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -286,7 +286,7 @@ export function SurveyView() {
 
     </div>
 
-    {/* Survey Navigation Button */}
-    <SurveyNavButton />
+    {/* Survey Navigation Bar */}
+    <SurveyNavBar />
   </>
 }

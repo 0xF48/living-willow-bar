@@ -7,7 +7,7 @@ export enum CONFIG {
 }
 
 export enum STYLE {
-  BUTTON = CONFIG.ROUNDED + ' hover:ring-3 flex items-center justify-center gap-2 transition-shadow p-4 px-6',
+  BUTTON = CONFIG.ROUNDED + ' flex items-center justify-center gap-2 transition-shadow p-4 px-6 hover:ring-3',
   BUTTON_DISABLED = 'bg-gray-300 text-gray-500 cursor-not-allowed !ring-0',
   BUTTON_ENABLED = 'cursor-pointer',
   BUTTON_LOADING = 'bg-gray-400 text-white cursor-wait !ring-0',

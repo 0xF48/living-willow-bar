@@ -3,8 +3,9 @@
 import { useApp } from '../context/AppContext';
 import { DrinkData, DRINKS, getDrink } from '@/data/drinks';
 import { DrinkId, STYLE, Nav, CONFIG } from '@/data/enums';
+import { MenuNavBar } from '../components/MenuNavBar';
 import cn from 'classnames';
-import { CarrotIcon, MessageCircleHeartIcon, RainbowIcon, ZapIcon } from 'lucide-react';
+import { CarrotIcon, RainbowIcon, ZapIcon } from 'lucide-react';
 
 
 function MatchBadge({ matchScore, isMatch }: { matchScore: number, isMatch: boolean }) {
@@ -99,7 +100,7 @@ function MenuDrinkCard({ matchScore, drinkId, drink, index }: { matchScore: numb
 
 
 export function MenuView() {
-  const { drinkRankings, hasHealthMatrix, setCurrentView } = useApp();
+  const { drinkRankings, hasHealthMatrix } = useApp();
 
   // Get all drinks, sorted by match score if available
   const allDrinks = Object.keys(DRINKS) as DrinkId[];
@@ -149,21 +150,10 @@ export function MenuView() {
 
         })
         }
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-20 left-40 transform z-40">
-          <button
-            onClick={() => setCurrentView(Nav.SURVEY)}
-            className={cn(
-              STYLE.BUTTON,
-              STYLE.SLATE,
-              'font-bold shadow-lg'
-            )}
-          >
-            <MessageCircleHeartIcon />
-            survey
-          </button>
-        </div>
       </div>
     </div>
+    
+    {/* Menu Navigation Bar */}
+    <MenuNavBar />
   </div>
 }
