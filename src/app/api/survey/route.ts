@@ -3,7 +3,7 @@ import { AI_CONFIG } from '@/data/enums';
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages } = await request.json();
+    const { messages, systemPrompt } = await request.json();
     
     const apiKey = process.env.CLAUDE_API_KEY;
     if (!apiKey) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         model: AI_CONFIG.MODEL,
         max_tokens: AI_CONFIG.MAX_TOKENS,
         temperature: AI_CONFIG.TEMPERATURE,
-        system: AI_CONFIG.SYSTEM_PROMPT,
+        system: systemPrompt || AI_CONFIG.SYSTEM_PROMPT,
         messages: messages
       })
     });

@@ -1,6 +1,6 @@
 export enum CONFIG {
   SURVEY_MAX_QUESTIONS = 7,  // Maximum questions per session (default: 7)
-  SURVEY_MAX_DURATION = 5000,
+  SURVEY_MAX_DURATION = 300000, // 5 minutes in milliseconds
   SURVEY_MIN_CONFIDENCE = 0.6,
   ROUNDED = 'rounded-2xl'
 }
@@ -9,6 +9,7 @@ export enum STYLE {
   BUTTON = CONFIG.ROUNDED + ' hover:ring-3 flex items-center justify-center gap-2 transition-shadow p-4 px-6',
   BUTTON_DISABLED = 'bg-gray-300 text-gray-500 cursor-not-allowed !ring-0',
   BUTTON_ENABLED = 'cursor-pointer',
+  BUTTON_LOADING = 'bg-gray-400 text-white cursor-wait !ring-0',
   BLACK = STYLE.BUTTON_ENABLED + ' bg-black text-white ring-black/20 hover:ring-black/30',
   SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-slate-200',
   BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white hover:ring-blue-200',
@@ -191,6 +192,90 @@ export const BodySystems: Record<BodySystem, BodySystemType> = {
   }
 }
 
+// Body system to health matrix mapping
+export const BODY_SYSTEM_MATRIX_MAPPING = {
+  [BodySystem.MENTAL]: {
+    energy: 0.3,
+    stress: 0.7,
+    inflammation: 0,
+    digestion: 0,
+    circulation: 0,
+    immunity: 0,
+    hydration: 0,
+    detox: 0,
+    confidence: {
+      energy: 0.6,
+      stress: 0.8,
+      inflammation: 0.3,
+      digestion: 0.3,
+      circulation: 0.3,
+      immunity: 0.3,
+      hydration: 0.3,
+      detox: 0.3,
+    }
+  },
+  [BodySystem.DIGESTIVE]: {
+    energy: 0,
+    stress: 0,
+    inflammation: 0.5,
+    digestion: 0.7,
+    circulation: 0,
+    immunity: 0,
+    hydration: 0,
+    detox: 0,
+    confidence: {
+      energy: 0.3,
+      stress: 0.3,
+      inflammation: 0.7,
+      digestion: 0.8,
+      circulation: 0.3,
+      immunity: 0.3,
+      hydration: 0.3,
+      detox: 0.3,
+    }
+  },
+  [BodySystem.VITALITY]: {
+    energy: 0.6,
+    stress: 0,
+    inflammation: 0,
+    digestion: 0,
+    circulation: 0.6,
+    immunity: 0.4,
+    hydration: 0,
+    detox: 0,
+    confidence: {
+      energy: 0.8,
+      stress: 0.3,
+      inflammation: 0.3,
+      digestion: 0.3,
+      circulation: 0.7,
+      immunity: 0.6,
+      hydration: 0.3,
+      detox: 0.3,
+    }
+  },
+  [BodySystem.RECOVERY]: {
+    energy: 0,
+    stress: 0,
+    inflammation: 0.4,
+    digestion: 0,
+    circulation: 0,
+    immunity: 0,
+    hydration: 0.6,
+    detox: 0.5,
+    confidence: {
+      energy: 0.3,
+      stress: 0.3,
+      inflammation: 0.6,
+      digestion: 0.3,
+      circulation: 0.3,
+      immunity: 0.3,
+      hydration: 0.8,
+      detox: 0.7,
+    }
+  }
+}
+
 export type BodySystemType = {
   title: string;
   emoji: string;
@@ -313,51 +398,9 @@ export const NAV_LABELS = {
 // Claude AI Configuration
 export const AI_CONFIG = {
   MODEL: 'claude-3-haiku-20240307', // Cheapest Claude model
-  MAX_TOKENS: 1000,
+  MAX_TOKENS: 1500,
   TEMPERATURE: 0.7,
-  API_URL: 'https://api.anthropic.com/v1/messages',
-  SYSTEM_PROMPT: `You are a wellness guide helping customers find the perfect health elixir based on their current needs. 
-
-The customer has already selected which body system(s) they need support with from these options:
-- Mental & Emotional (🧠): stress, anxiety, focus, or mood
-- Digestive & Gut Health (🌿): bloating, discomfort, or digestive issues  
-- Physical Energy & Circulation (❤️): fatigue, stamina, or feeling sluggish
-- Recovery & Detox (💧): feeling run down, dehydrated, or needing cleansing
-
-Your role:
-- Ask 2-4 targeted follow-up questions based on their selected body system(s)
-- Focus specifically on the effects relevant to their chosen system(s)
-- Keep questions conversational and empathetic, like the example: "Okay, feeling a bit run down and sluggish? Would you say you feel more X or more Y or about the same with both?"
-- Map their responses to quantified health effects
-- Complete the assessment efficiently (don't drag it out)
-
-Health effects mapping:
-- Mental & Emotional → energy (-1 to 1), stress (-1 to 1) 
-- Digestive & Gut Health → digestion (-1 to 1), inflammation (-1 to 1)
-- Physical Energy & Circulation → energy (-1 to 1), circulation (-1 to 1), immunity (0 to 1)
-- Recovery & Detox → hydration (0 to 1), detox (0 to 1), inflammation (-1 to 1)
-
-IMPORTANT: After 2-4 targeted questions, provide your [ANALYSIS] with:
-{
-  "energy": number (-1 to 1),
-  "stress": number (-1 to 1), 
-  "inflammation": number (-1 to 1),
-  "digestion": number (-1 to 1),
-  "circulation": number (-1 to 1),
-  "immunity": number (0 to 1),
-  "hydration": number (0 to 1),
-  "detox": number (0 to 1),
-  "confidence": {
-    "energy": number (0 to 1),
-    "stress": number (0 to 1),
-    "inflammation": number (0 to 1),
-    "digestion": number (0 to 1),
-    "circulation": number (0 to 1),
-    "immunity": number (0 to 1),
-    "hydration": number (0 to 1),
-    "detox": number (0 to 1)
-  }
-}`
+  API_URL: 'https://api.anthropic.com/v1/messages'
 }
 
 // Survey option types for rendering (numeric for compression)

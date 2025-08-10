@@ -1,34 +1,69 @@
-import { BodySystem, EffectType, HealthMatrix } from './enums';
+import { BodySystem, EffectType, HealthMatrix, BODY_SYSTEM_MATRIX_MAPPING } from './enums';
+import { DRINKS } from './drinks';
 
-// Sample conversation starters by category
-export const CONVERSATION_STARTERS = {
+// Build complete system prompt with all static data
+export const buildSystemPrompt = (): string => {
+  // Get drinks data with effects matrices
+  const drinksData = Object.entries(DRINKS).map(([id, drink]) => ({
+    id,
+    name: drink.name,
+    effectsMatrix: drink.effectsMatrix
+  }));
 
+  const systemPrompt = `You are a wellness guide helping customers find the perfect health elixir. You will receive and respond ONLY in JSON format.
 
-  followUp: {
-    stress: [
-      "On a scale of overwhelming to manageable, how would you describe your stress level?",
-      "What's contributing most to your stress right now - work, relationships, or physical tension?",
-      "Do you feel more mentally anxious or physically tense?"
-    ],
+BODY SYSTEMS & MATRIX MAPPINGS:
+${JSON.stringify(BODY_SYSTEM_MATRIX_MAPPING, null, 2)}
 
-    energy: [
-      "Is this more of a tired-but-wired feeling, or genuinely low energy?",
-      "When did you last feel truly energized and alert?",
-      "Are you looking for gentle sustained energy or a more noticeable boost?"
-    ],
+AVAILABLE DRINKS:
+${JSON.stringify(drinksData, null, 2)}
 
-    digestion: [
-      "Is this more like bloating and discomfort, or sharp pain and nausea?",
-      "Does this happen after meals, or is it more constant throughout the day?",
-      "Are you looking for something soothing or something to stimulate digestion?"
-    ],
-
-    physical: [
-      "Is this more about cardiovascular stamina or muscular endurance?",
-      "Do you feel like you need better circulation or more overall vitality?",
-      "Are you experiencing any stiffness or inflammation alongside the fatigue?"
-    ]
+COMMUNICATION PROTOCOL:
+- All input will be JSON with: selectedOptions, customText, conversationHistory, currentDrinkRankings
+- All output must be valid JSON with this exact structure:
+{
+  "question": "Short question text (no options embedded)",
+  "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+  "isComplete": false,
+  "healthMatrix": {
+    "energy": number (-1 to 1),
+    "stress": number (-1 to 1),
+    "inflammation": number (-1 to 1), 
+    "digestion": number (-1 to 1),
+    "circulation": number (-1 to 1),
+    "immunity": number (0 to 1),
+    "hydration": number (0 to 1),
+    "detox": number (0 to 1),
+    "confidence": {
+      "energy": number (0 to 1),
+      "stress": number (0 to 1),
+      "inflammation": number (0 to 1),
+      "digestion": number (0 to 1),
+      "circulation": number (0 to 1),
+      "immunity": number (0 to 1),
+      "hydration": number (0 to 1),
+      "detox": number (0 to 1)
+    }
   }
+}
+
+IMPORTANT RULES:
+- The first request will always contain one of these 4 body systems: MENTAL, DIGESTIVE, VITALITY, RECOVERY
+- Always return a healthMatrix after each question to track progress
+- Set isComplete: true after 2-4 targeted questions
+- ALWAYS provide exactly 2-4 options in the options array - NEVER return null
+- Keep questions very short (5-8 words max) - do NOT include options in the question text
+- Put answer choices only in the options array, not in the question
+- Focus on distinguishing between top-ranked drinks
+- Ask about intensity, timing, symptoms, or preferences
+- Example good question: "How intense is your stress?" with options: ["Mild tension", "Moderate anxiety", "High stress", "Overwhelming"]`;
+
+  // Debug: Log system prompt
+  console.log('=== SYSTEM PROMPT (BUILT IN SURVEY.TS) ===');
+  console.log(systemPrompt);
+  console.log('==========================================');
+
+  return systemPrompt;
 };
 
 // Helper functions for survey processing

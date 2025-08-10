@@ -283,3 +283,7 @@ export const calculateDrinkMatch = (
 
   return Math.max(0, similarity); // Ensure non-negative score
 };
+
+
+
+console.log(DRINKS)
