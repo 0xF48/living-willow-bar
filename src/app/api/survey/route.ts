@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         model: AI_CONFIG.MODEL,
         max_tokens: AI_CONFIG.MAX_TOKENS,
         temperature: AI_CONFIG.TEMPERATURE,
-        system: systemPrompt || AI_CONFIG.SYSTEM_PROMPT,
+        system: systemPrompt,
         messages: messages
       })
     });
