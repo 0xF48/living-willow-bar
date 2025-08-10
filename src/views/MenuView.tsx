@@ -22,9 +22,16 @@ function MenuDrinkCard({ matchScore, drinkId, drink, index, isLast }: { matchSco
   const hasMatch = matchScore !== null
   const router = useRouter();
 
-  // Calculate the same color as the match badge
-  const hue = matchScore !== null ? matchScore * 120 : 0;
-  const indexColor = matchScore !== null ? `hsl(${hue}, 70%, 35%)` : '#374151'; // gray-700 as fallback
+  // Calculate the same color as the match badge (gray to blue transition)
+  const indexColor = matchScore !== null 
+    ? (() => {
+        const grayValue = Math.round((1 - matchScore) * 128 + 64);
+        const blueValue = Math.round(matchScore * 191 + 64);
+        return matchScore > 0.1 
+          ? `rgb(${grayValue}, ${grayValue}, ${blueValue})`
+          : `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+      })()
+    : '#374151'; // gray-700 as fallback
 
   const handleClick = () => {
     router.push(`/drink/${drinkId}`);
@@ -56,7 +63,7 @@ function MenuDrinkCard({ matchScore, drinkId, drink, index, isLast }: { matchSco
         <div className="w-full h-full bg-gradient-to-b from-transparent to-black rounded-2xl"></div>
 
         {/* Match Badge positioned relative to image */}
-        {matchScore !== null && (
+        {matchScore !== null && matchScore > 0 && (
           <MatchBadge matchScore={matchScore} isMatch={matchScore >= CONFIG.DRINK_MATCH_THRESHOLD} />
         )}
       </div>

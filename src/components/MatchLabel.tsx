@@ -9,10 +9,12 @@ interface MatchLabelProps {
 }
 
 export function MatchLabel({ matchScore, className = "", showMatchText = false }: MatchLabelProps) {
-  // Map match score (0-1) to HSL hue (0° red to 60° yellow to 120° green)
-  const hue = matchScore * 120;
-  // Darken the background by reducing lightness
-  const backgroundColor = `hsl(${hue}, 70%, 35%)`;
+  // Map match score (0-1) from gray to blue
+  const grayValue = Math.round((1 - matchScore) * 128 + 64); // 192 (light gray) to 64 (dark gray)
+  const blueValue = Math.round(matchScore * 191 + 64); // 64 to 255 (blue intensity)
+  const backgroundColor = matchScore > 0.1 
+    ? `rgb(${grayValue}, ${grayValue}, ${blueValue})` // Gray to blue transition
+    : `rgb(${grayValue}, ${grayValue}, ${grayValue})`; // Pure gray for very low scores
   
   const isMatch = matchScore >= CONFIG.DRINK_MATCH_THRESHOLD;
 

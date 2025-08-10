@@ -4,7 +4,8 @@ import { buildSystemPrompt } from '@/data/survey';
 import { DrinkId, ConversationResponse, CONFIG, HealthMatrix, BodySystems, SurveyOption, OptionType, BodySystemType, ENTRY_HEADERS, ENTRY_PROMPTS } from '@/data/enums';
 import { calculateDrinkMatch, DrinkData, DRINKS, getDrink } from '@/data/drinks';
 import _ from 'lodash'
-import { randomItem } from './util';
+import { randomItem } from '@/lib/utils';
+
 
 
 
