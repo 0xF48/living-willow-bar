@@ -51,14 +51,19 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
   } else {
     position = TEXT_ANSWER_BUTTON_FIXED_POS
     content = <div
-      className="w-full h-full flex items-start flex-col font-display text-black  bg-white p-10">
+      className="w-full h-full flex items-center flex-col font-display text-black  p-10 gap-9">
       <div>{currentQuestion}</div>
-      <textarea className='' placeholder='your response'>
+      <textarea className={cn(
+        CONFIG.BUTTON_STYLE,
+        'bg-white text-black hover:ring-slate-200 font-bold w-full'
+      )} placeholder='custom response'>
 
       </textarea>
 
+
       <button className={cn(
-        'bg-blue-500 text-white'
+        CONFIG.BUTTON_STYLE,
+        'bg-blue-500 text-white hover:ring-blue-200 font-bold'
       )}
         onClick={onSubmit}>
         done
