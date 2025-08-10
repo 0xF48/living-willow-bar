@@ -1,10 +1,5 @@
-import { AppProvider } from './context/AppContext';
-import { AppShell } from './components/AppShell';
+import { SurveyView } from '../views/SurveyView';
 
 export default function Home() {
-  return (
-    <AppProvider>
-      <AppShell />
-    </AppProvider>
-  );
+  return <SurveyView />
 }

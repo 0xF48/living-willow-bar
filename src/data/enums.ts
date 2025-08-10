@@ -7,7 +7,7 @@ export enum CONFIG {
 }
 
 export enum STYLE {
-  BUTTON = CONFIG.ROUNDED + ' flex items-center justify-center gap-2 transition-shadow p-4 px-6 hover:ring-3',
+  BUTTON = CONFIG.ROUNDED + ' flex items-center justify-center gap-2 transition-shadow p-4 px-6 hover:ring-3 min-h-16',
   BUTTON_DISABLED = 'bg-gray-300 text-gray-500 cursor-not-allowed !ring-0',
   BUTTON_ENABLED = 'cursor-pointer',
   BUTTON_LOADING = 'bg-gray-400 text-white cursor-wait !ring-0',
@@ -18,13 +18,13 @@ export enum STYLE {
   YELLOW = STYLE.BUTTON_ENABLED + ' ring-yellow-400 ring-3 bg-yellow-200'
 }
 
-export const WELCOME_QUESTIONS = [
+export const ENTRY_PROMPTS = [
   "Welcome! I'm here to help find your perfect wellness elixir. How are you feeling in your body right now?",
   "Hi! I'm your wellness guide. What's bringing you here today - what would you like support with?",
   "Hello! Let's find an elixir that matches your current needs. How would you describe your energy and mood today?"
 ]
 
-export const WELCOME_TITLES = [
+export const ENTRY_HEADERS = [
   'Welcome!',
   'Hey There!'
 ]
@@ -190,6 +190,27 @@ export const BodySystems: Record<BodySystem, BodySystemType> = {
     description: 'feeling run down, dehydrated, or needing cleansing',
     emoji: '💧',
     effects: [EffectType.HYDRATION, EffectType.DETOX, EffectType.INFLAMMATION]
+  }
+}
+
+export const EMPTY_HEALTH_MATRIX: HealthMatrix = {
+  energy: 0,
+  stress: 0,
+  inflammation: 0,
+  digestion: 0,
+  circulation: 0,
+  immunity: 0,
+  hydration: 0,
+  detox: 0,
+  confidence: {
+    energy: 0,
+    stress: 0,
+    inflammation: 0,
+    digestion: 0,
+    circulation: 0,
+    immunity: 0,
+    hydration: 0,
+    detox: 0,
   }
 }
 
@@ -412,12 +433,7 @@ export enum OptionType {
 
 // Survey option interface
 export interface SurveyOption {
-  id: string;
-  type: OptionType;
-  title: string;
-  description?: string;
-  icon?: string;
-  selected: boolean;
+  text?: string;
+  hint?: string;
+  emoji?: string;
 }
-
-

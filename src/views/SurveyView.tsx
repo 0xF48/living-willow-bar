@@ -2,14 +2,13 @@
 
 import { CONFIG, OptionType, SurveyOption, STYLE } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
-import { useApp } from '../context/AppContext';
 import { SurveyNavBar } from '../components/SurveyNavBar';
 import cn from 'classnames'
-import { ArrowBigRightDashIcon, MessageCircleHeartIcon, ArrowRight, X, Loader, XIcon } from 'lucide-react';
+import { ArrowBigRightDashIcon, MessageCircleHeartIcon, X, Loader, XIcon } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import MotionBox from '../components/MotionBox';
-
+import _clone from 'lodash/clone'
 
 function ResetSurveyButton({ onSubmit, disabled }: { onSubmit: any, disabled: boolean }) {
   return <button
@@ -68,14 +67,17 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
   const [textResponse, setTextResponse] = useState('')
   const [textResponseOpen, setTextResponseOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
   const handleSave = () => {
-    onSubmit(textResponse)
-    setTextResponseOpen(false)
+    if (textResponse.trim().length > 0) {
+      onSubmit(textResponse.trim())
+      setTextResponse('')
+      setTextResponseOpen(false)
+    }
   }
 
   const handleClear = () => {
@@ -134,7 +136,7 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
             'font-bold w-40'
           )}
           onClick={handleSave}>
-          <ArrowRight />
+          <ArrowBigRightDashIcon />
         </button>
       </div>
     </div>
@@ -159,36 +161,26 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
 
 }
 
-function SelectableOption({ selected, children, onSelect }: { selected: boolean, children: any, onSelect: any }) {
-  return <button onClick={onSelect} className={cn(
+
+function SurveyOptionButton({ option, onSelect, selected, index }: { index: number, option: SurveyOption, onSelect: any, selected: boolean }) {
+  return <button onClick={() => {
+    onSelect(index)
+  }} className={cn(
     STYLE.BUTTON,
     'flex-row justify-start',
     selected ? STYLE.YELLOW : STYLE.SLATE
-  )} >{children}</button>
-}
-
-function SurveyBodySystemOptionButton({ option, onSelect }: { option: SurveyOption, onSelect: any }) {
-  return <SelectableOption onSelect={() => { onSelect(option.id) }} selected={option.selected}>
-    <div className='w-fit text-2xl flex items-center justify-center pr-5 pl-2'>
-      {option.icon}
+  )}>
+    <div className='w-16 text-2xl'>
+      {option.emoji}
     </div>
-    <div className='text-left'>
-      <div className='text-md font-bold'>{option.title}</div>
-      <div className='text-md font-regular'>{option.description}</div>
+    <div className='flex flex-col items-start'>
+      <div className='text-xl font-bold'>{option.text}</div>
+      <div className='text-md'>{option.text}</div>
     </div>
-  </SelectableOption>
-}
+  </button>
 
 
-function SurveySelectAnswerOptionButton({ option, onSelect }: { option: SurveyOption, onSelect: any }) {
-  return <SelectableOption onSelect={() => { onSelect(option.id) }} selected={option.selected}>
-    <div className='w-20 text-2xl'>
-      {option.icon}
-    </div>
-    <div>
-      <div className='text-md font-bold'>{option.title}</div>
-    </div>
-  </SelectableOption>
+
 }
 
 
@@ -196,45 +188,47 @@ function SurveySelectAnswerOptionButton({ option, onSelect }: { option: SurveyOp
 
 export function SurveyView() {
 
-  const [customTextResponse, setCustomTextResponse] = useState('')
-  const { toggleCurrentOptionSelect, currentQuestion, currentTitle, currentOptions, submitResponse, setCurrentTextResponse, isLoading, conversation, conversationComplete, sortedDrinks, recommendedDrink, resetSurvey } = useSurvey()
-  const { updateDrinkRankings, setHasHealthMatrix } = useApp()
+  const { isLoading, resetSurvey, currentForm, responseList, submitForm } = useSurvey()
 
-  // Clear custom text when a new question is received
+  const [selected, setSelected] = useState<boolean[]>([])
+
+
   useEffect(() => {
-    setCustomTextResponse('')
-  }, [currentQuestion])
+    setSelected([])
+  }, [currentForm])
 
-  // Update app context when drink rankings change
-  useEffect(() => {
-    if (sortedDrinks.length > 0) {
-      updateDrinkRankings(sortedDrinks)
-      setHasHealthMatrix(true)
-    }
-  }, [sortedDrinks, updateDrinkRankings, setHasHealthMatrix])
 
-  // Check if there are any selected options
-  const hasSelectedOptions = currentOptions.some(option => option.selected)
-
-  // Check if there's custom text response
-  const hasCustomText = customTextResponse.trim().length > 0
-
-  // For follow-up questions (when no options available), only require custom text
-  // For initial questions (when options available), require either selection or custom text
-  const isSubmitDisabled = currentOptions.length === 0
-    ? (!hasCustomText || isLoading)  // Follow-up: only need custom text
-    : ((!hasSelectedOptions && !hasCustomText) || isLoading)  // Initial: need options OR custom text
-
-  const handleCustomTextSubmit = (text: string) => {
-    setCustomTextResponse(text)
-    setCurrentTextResponse(text)
+  function submitResponseOptions() {
+    let responseText = ""
+    currentForm.options.forEach((opt, i) => {
+      if (selected[i] === true) {
+        responseText += ' & ' + opt.text
+      }
+    })
+    submitForm({
+      prompt: currentForm.prompt,
+      response: responseText
+    })
   }
 
+  function submitResponseText(text: string) {
+    submitForm({
+      prompt: currentForm.prompt,
+      response: text
+    })
+  }
 
-  const resetDisabled = conversation.length == 0
+  function toggleOptionSelect(index: number) {
+    let new_selected = _clone(selected)
+    new_selected[index] = !!!new_selected[index]
+    setSelected(new_selected)
+  }
 
+  const noResponses = responseList.length == 0
 
-
+  const nonSelected = selected.filter((v) => {
+    return v === true
+  }).length == 0
 
 
   return <>
@@ -243,45 +237,33 @@ export function SurveyView() {
       {/* Progress indicator */}
 
       <div className='w-full text-center text-sm text-gray-500'>
-        Question {conversation.length + 1} of {CONFIG.SURVEY_MAX_QUESTIONS}
+        Question {responseList.length + 1} of {CONFIG.SURVEY_MAX_QUESTIONS}
       </div>
 
 
       <div className='w-full text-center font-bold text-2xl'>
-        {currentTitle}
+        {currentForm.header}
       </div>
 
       <div className='w-full text-left'>
-        {currentQuestion}
+        {currentForm.prompt}
       </div>
 
-      {/* Show body system options for first question, then continue with follow-up questions */}
-      {!conversationComplete && currentOptions.map((opt) => {
-        if (opt.type == OptionType.BODY_SYSTEM) {
-          return <SurveyBodySystemOptionButton onSelect={toggleCurrentOptionSelect} key={opt.id} option={opt} />
-        } else if (opt.type == OptionType.SELECTED_ANSWER) {
-          return <SurveySelectAnswerOptionButton onSelect={toggleCurrentOptionSelect} key={opt.id} option={opt} />
-        }
+      {currentForm.options.map((opt, i) => {
+        return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />
       })}
 
-      {/* Show sorted drinks list if we have rankings */}
-
-
-      {/* Show completion message if survey is done */}
-      {conversationComplete ? (
+      {!currentForm.options ? (
         <div className='w-full text-center text-green-600 font-bold'>
           Assessment complete! Your recommendation is ready.
         </div>
       ) : (
         <div className='w-full flex flex-row gap-4'>
-          <ResetSurveyButton onSubmit={resetSurvey} disabled={resetDisabled} />
-          <TextAnswerButton currentQuestion={currentQuestion} onSubmit={handleCustomTextSubmit} />
-          <SubmitAnswerButton onSubmit={submitResponse} disabled={isSubmitDisabled} isLoading={isLoading} />
+          <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} />
+          <TextAnswerButton currentQuestion={currentForm.prompt} onSubmit={submitResponseText} />
+          <SubmitAnswerButton onSubmit={submitResponseOptions} disabled={nonSelected} isLoading={isLoading} />
         </div>
       )}
-
-
-
 
 
     </div>

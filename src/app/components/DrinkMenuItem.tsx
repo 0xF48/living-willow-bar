@@ -1,1 +1,0 @@
-//drink list item that is used by DrinkView.ts
