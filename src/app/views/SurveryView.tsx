@@ -1,22 +1,28 @@
 'use client';
 
-import { CONFIG, OptionType, SurveyOption } from '@/data/enums';
+import { CONFIG, OptionType, SurveyOption, STYLE } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
 import cn from 'classnames'
-import { ArrowBigRightDashIcon, MessageCircleHeartIcon } from 'lucide-react';
+import { ArrowBigRightDashIcon, MessageCircleHeartIcon, ArrowRight, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import MotionBox from '../components/MotionBox';
 
 
-function SubmitAnswerButton({ onSubmit }: { onSubmit: any }) {
+function SubmitAnswerButton({ onSubmit, disabled }: { onSubmit: any, disabled: boolean }) {
 
-  return <button onClick={onSubmit} className={
-    cn(
-      CONFIG.BUTTON_STYLE,
-      'bg-black text-white  ring-black/20 font-bold '
-    )
-  }>
+  return <button
+    disabled={disabled}
+    onClick={onSubmit}
+    className={
+      cn(
+        STYLE.BUTTON,
+        disabled
+          ? STYLE.BUTTON_DISABLED
+          : STYLE.BLACK,
+        'font-bold'
+      )
+    }>
     <ArrowBigRightDashIcon />
     submit
   </button>
@@ -29,23 +35,32 @@ const TEXT_ANSWER_BUTTON_FIXED_POS = 'fixed left-1/2 top-1/2 -translate-x-1/2 -t
 
 function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: string, onSubmit: any }) {
 
-  const [textResponse, setTextResponse] = useState(false)
-
+  const [textResponse, setTextResponse] = useState('')
   const [textResponseOpen, setTextResponseOpen] = useState(false)
 
-  // console.log(textResponseOpen)
+  const handleSave = () => {
+    onSubmit(textResponse)
+    setTextResponseOpen(false)
+  }
 
-
-
+  const handleClear = () => {
+    setTextResponse('')
+    setTextResponseOpen(false)
+  }
 
   let position
   let content
 
   if (textResponseOpen == false) {
     position = TEXT_ANSWER_BUTTON_RELATIVE_POS
+    const hasText = textResponse.trim().length > 0
     content = <div
       onClick={() => { setTextResponseOpen(true) }}
-      className={cn(CONFIG.BUTTON_STYLE, 'bg-slate-50 ring-slate-200 font-bold ')}>
+      className={cn(
+        STYLE.BUTTON,
+        hasText ? STYLE.YELLOW : STYLE.SLATE,
+        'font-bold'
+      )}>
       <MessageCircleHeartIcon /> custom
     </div>
   } else {
@@ -53,21 +68,42 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
     content = <div
       className="w-full h-full flex items-center flex-col font-display text-black  p-10 gap-9">
       <div>{currentQuestion}</div>
-      <textarea className={cn(
-        CONFIG.BUTTON_STYLE,
-        'bg-white text-black hover:ring-slate-200 font-bold w-full'
-      )} placeholder='custom response'>
-
+      <textarea
+        value={textResponse}
+        onChange={(e) => setTextResponse(e.target.value)}
+        className={cn(
+          STYLE.BUTTON,
+          'bg-white text-black hover:ring-slate-200 font-bold w-full min-h-40'
+        )}
+        placeholder='custom response'>
       </textarea>
 
-
-      <button className={cn(
-        CONFIG.BUTTON_STYLE,
-        'bg-blue-500 text-white hover:ring-blue-200 font-bold'
-      )}
-        onClick={onSubmit}>
-        done
-      </button>
+      <div className="flex gap-4 w-full justify-between">
+        <button
+          disabled={textResponse.trim().length === 0}
+          className={cn(
+            STYLE.BUTTON,
+            textResponse.trim().length === 0
+              ? STYLE.BUTTON_DISABLED
+              : STYLE.ORANGE,
+            'font-bold w-20'
+          )}
+          onClick={handleClear}>
+          <X />
+        </button>
+        <button
+          disabled={textResponse.trim().length === 0}
+          className={cn(
+            STYLE.BUTTON,
+            textResponse.trim().length === 0
+              ? STYLE.BUTTON_DISABLED
+              : STYLE.BLUE,
+            'font-bold w-40'
+          )}
+          onClick={handleSave}>
+          <ArrowRight />
+        </button>
+      </div>
     </div>
   }
 
@@ -92,9 +128,9 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
 
 function SelectableOption({ selected, children, onSelect }: { selected: boolean, children: any, onSelect: any }) {
   return <button onClick={onSelect} className={cn(
-    CONFIG.BUTTON_STYLE,
-    'flex-row items-center justify-start hover:ring-3 transition-colors',
-    selected ? 'ring-yellow-400 ring-3 bg-yellow-200' : 'ring-slate-200 bg-slate-50'
+    STYLE.BUTTON,
+    'flex-row justify-start',
+    selected ? STYLE.YELLOW : STYLE.SLATE
   )} >{children}</button>
 }
 
@@ -127,8 +163,22 @@ function SurveySelectAnswerOptionButton({ option, onSelect }: { option: SurveyOp
 
 export function SurveyView() {
 
-
+  const [customTextResponse, setCustomTextResponse] = useState('')
   const { toggleCurrentOptionSelect, currentQuestion, currentTitle, currentOptions, submitResponse, setCurrentTextResponse } = useSurvey()
+
+  // Check if there are any selected options
+  const hasSelectedOptions = currentOptions.some(option => option.selected)
+
+  // Check if there's custom text response
+  const hasCustomText = customTextResponse.trim().length > 0
+
+  // Disable submit if no options selected and no custom text
+  const isSubmitDisabled = !hasSelectedOptions && !hasCustomText
+
+  const handleCustomTextSubmit = (text: string) => {
+    setCustomTextResponse(text)
+    setCurrentTextResponse(text)
+  }
 
 
 
@@ -158,8 +208,8 @@ export function SurveyView() {
 
 
     <div className='w-full flex flex-row gap-4'>
-      <TextAnswerButton currentQuestion={currentQuestion} onSubmit={setCurrentTextResponse} />
-      <SubmitAnswerButton onSubmit={submitResponse} />
+      <TextAnswerButton currentQuestion={currentQuestion} onSubmit={handleCustomTextSubmit} />
+      <SubmitAnswerButton onSubmit={submitResponse} disabled={isSubmitDisabled} />
     </div>
 
 

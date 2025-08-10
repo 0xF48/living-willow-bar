@@ -2,8 +2,18 @@ export enum CONFIG {
   SURVEY_MAX_QUESTIONS = 7,  // Maximum questions per session (default: 7)
   SURVEY_MAX_DURATION = 5000,
   SURVEY_MIN_CONFIDENCE = 0.6,
-  ROUNDED = 'rounded-2xl',
-  BUTTON_STYLE = CONFIG.ROUNDED + ' hover:ring-3 flex items-center justify-center gap-2 transition-shadow p-4 px-6 cursor-pointer'
+  ROUNDED = 'rounded-2xl'
+}
+
+export enum STYLE {
+  BUTTON = CONFIG.ROUNDED + ' hover:ring-3 flex items-center justify-center gap-2 transition-shadow p-4 px-6',
+  BUTTON_DISABLED = 'bg-gray-300 text-gray-500 cursor-not-allowed !ring-0',
+  BUTTON_ENABLED = 'cursor-pointer',
+  BLACK = STYLE.BUTTON_ENABLED + ' bg-black text-white ring-black/20 hover:ring-black/30',
+  SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-slate-200',
+  BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white hover:ring-blue-200',
+  ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-white hover:ring-red-200',
+  YELLOW = STYLE.BUTTON_ENABLED + ' ring-yellow-400 ring-3 bg-yellow-200'
 }
 
 export const WELCOME_QUESTIONS = [
