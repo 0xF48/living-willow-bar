@@ -170,12 +170,12 @@ function SurveyOptionButton({ option, onSelect, selected, index }: { index: numb
     'flex-row justify-start',
     selected ? STYLE.YELLOW : STYLE.SLATE
   )}>
-    <div className='w-16 text-2xl'>
+    <div className='w-14 -ml-2 text-2xl'>
       {option.emoji}
     </div>
     <div className='flex flex-col items-start'>
-      <div className='text-xl font-bold'>{option.text}</div>
-      <div className='text-md'>{option.text}</div>
+      <div className='text-xl font-bold text-left'>{option.text}</div>
+      <div className='text-md text-left'>{option.hint}</div>
     </div>
   </button>
 
