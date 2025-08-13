@@ -14,7 +14,6 @@ export interface UseSurveyReturn {
   submitForm: (response: SurveyResponse) => void;
   responseList: SurveyResponse[];
   isLoading: boolean;
-  surveyDrink?: DrinkId | null;
   error: string | null;
   healthMatrix: HealthMatrix | null;
   resetSurvey: () => void;
@@ -23,8 +22,7 @@ export interface UseSurveyReturn {
 
 
 export interface AIResponseDataType {
-  surveyForm?: SurveyForm,
-  drinkId?: DrinkId,
+  surveyForm: SurveyForm,
   systemMessage?: string,
   healthMatrix: HealthMatrix
 }
@@ -108,6 +106,7 @@ export type SurveyResponse = {
 
 export type SurveyForm = {
   header: string,
+  drinkId?: DrinkId,
   prompt: string,
   options: SurveyOption[],
 }
@@ -180,7 +179,7 @@ export function useSurveyInternal(): UseSurveyReturn {
   const [error, setError] = useState<string | null>(null);
   const [responseList, setResponseList] = useState<SurveyResponse[]>([])
   const [currentForm, setCurrentForm] = useState<SurveyForm>(EMPTY_ENTRY_FORM)
-  const [surveyDrink, setSurveyDrink] = useState<DrinkId | null>(null)
+
 
   // Set random entry form after hydration to avoid SSR mismatch
   useEffect(() => {
@@ -242,8 +241,8 @@ export function useSurveyInternal(): UseSurveyReturn {
 
       if (aiResponse.surveyForm) {
         setCurrentForm(aiResponse.surveyForm)
-      } else if (aiResponse.drinkId) {
-        setSurveyDrink(aiResponse.drinkId)
+      } else {
+        throw 'ai response: surveyForm missing'
       }
 
 
@@ -282,7 +281,6 @@ export function useSurveyInternal(): UseSurveyReturn {
 
   return {
     currentForm,
-    surveyDrink,
     submitForm,
     responseList,
     healthMatrix,

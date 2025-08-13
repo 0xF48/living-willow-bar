@@ -42,7 +42,7 @@ function SubmitAnswerButton({ onSubmit, disabled, isLoading }: { onSubmit: any, 
           ? STYLE.BUTTON_DISABLED
           : isLoading
             ? STYLE.BUTTON_LOADING
-            : STYLE.BLUE,
+            : cn(STYLE.BLUE, STYLE.BUTTON_BLUE_SHADOW),
         'font-bold w-20'
       )
     }>
@@ -60,7 +60,7 @@ function SubmitAnswerButton({ onSubmit, disabled, isLoading }: { onSubmit: any, 
 
 
 const TEXT_ANSWER_BUTTON_RELATIVE_POS = 'relative w-full h-14'
-const TEXT_ANSWER_BUTTON_FIXED_POS = 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem]'
+const TEXT_ANSWER_BUTTON_FIXED_POS = 'fixed bottom-30 left-1/2 -translate-x-1/2 max-w-[40rem] h-[20rem] w-[calc(100%-40px)]'
 
 
 function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: string, onSubmit: any }) {
@@ -89,14 +89,16 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
   let position
   let content
 
+  const hasText = textResponse.trim().length > 0
+
   if (textResponseOpen == false) {
     position = TEXT_ANSWER_BUTTON_RELATIVE_POS
-    const hasText = textResponse.trim().length > 0
+
     content = <div
       onClick={() => { setTextResponseOpen(true) }}
       className={cn(
         STYLE.BUTTON,
-        hasText ? STYLE.YELLOW : STYLE.SLATE,
+        STYLE.SLATE,
         'font-bold'
       )}>
       <MessageCircleHeartIcon /> custom
@@ -104,25 +106,25 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
   } else {
     position = TEXT_ANSWER_BUTTON_FIXED_POS
     content = <div
-      className="w-full h-full flex items-center flex-col font-display text-black  p-10 gap-9">
-      <div>{currentQuestion}</div>
+      className="w-full h-full">
+      {/* <div>{currentQuestion}</div> */}
       <textarea
+        autoFocus={true}
         value={textResponse}
         onChange={(e) => setTextResponse(e.target.value)}
         className={cn(
-          STYLE.BUTTON,
-          'bg-white text-black hover:ring-slate-200 font-bold w-full min-h-40'
+          'font-bold w-full h-full p-10 outline-none ring-0 hover:ring-0'
         )}
         placeholder='custom response'>
       </textarea>
 
-      <div className="flex gap-4 w-full justify-between">
+      <div className="flex gap-4 w-full justify-between p-10 absolute left-0 bottom-0 pointer-events-none">
         <button
           disabled={false}
           className={cn(
             STYLE.BUTTON,
             STYLE.ORANGE,
-            'font-bold w-20'
+            'font-bold w-20 pointer-events-auto'
           )}
           onClick={handleClear}>
           <X />
@@ -134,7 +136,7 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
             textResponse.trim().length === 0
               ? STYLE.BUTTON_DISABLED
               : STYLE.BLUE,
-            'font-bold w-40'
+            'font-bold w-40 pointer-events-auto'
           )}
           onClick={handleSave}>
           <ArrowBigRightDashIcon />
@@ -148,11 +150,11 @@ function TextAnswerButton({ onSubmit, currentQuestion }: { currentQuestion: stri
       <div
         onClick={() => { setTextResponseOpen(false) }}
         className={
-          cn("z-10 w-full h-full fixed transition-opacity duration-200 left-0 top-0 bg-slate-100/90 backdrop-blur-xl",
+          cn("z-60 w-full h-full fixed transition-opacity duration-200 left-0 top-0 bg-slate-200/60 backdrop-blur-sm cursor-pointer",
             textResponseOpen ? ' opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')} ></div >, document.body)}
     <MotionBox
       classNames={{
-        style: 'z-40 ' + CONFIG.ROUNDED,
+        style: textResponseOpen ? cn('z-80', STYLE.BUTTON, hasText ? STYLE.SLATE_SELECTED : STYLE.SLATE) : '',
         position: position
       }}>
       {content}
@@ -169,7 +171,7 @@ function SurveyOptionButton({ option, onSelect, selected, index }: { index: numb
   }} className={cn(
     STYLE.BUTTON,
     'flex-row justify-start',
-    selected ? STYLE.YELLOW : STYLE.SLATE
+    selected ? STYLE.SLATE_SELECTED : STYLE.SLATE
   )}>
     <div className='w-14 -ml-2 text-2xl'>
       {option.emoji}
@@ -189,7 +191,7 @@ function SurveyOptionButton({ option, onSelect, selected, index }: { index: numb
 
 export function SurveyView() {
 
-  const { surveyDrink, isLoading, resetSurvey, currentForm, responseList, submitForm } = useSurvey()
+  const { isLoading, resetSurvey, currentForm, responseList, submitForm } = useSurvey()
 
   const [selected, setSelected] = useState<boolean[]>([])
 
@@ -261,8 +263,8 @@ export function SurveyView() {
         {currentForm.prompt}
       </div>
 
-      {surveyDrink ? <div className='flex'>
-        <TopMatchButton topMatch={{ drinkId: surveyDrink, score: 0 }} />
+      {currentForm.drinkId ? <div className='flex'>
+        <TopMatchButton topMatch={{ drinkId: currentForm.drinkId, score: 0 }} />
       </div> : <>
         {currentForm.options.map((opt, i) => {
           return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />

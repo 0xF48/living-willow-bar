@@ -8,11 +8,12 @@ import { AIResponseDataType } from '@/hooks/useSurvey';
 const AI_RESPONSE_EXAMPLE: AIResponseDataType = {
   healthMatrix: EMPTY_HEALTH_MATRIX,
   //@ts-ignore
-  drinkId: DrinkId.BAOBAB_VITAL_BREW,
+
   systemMessage: '[you can add a response for developer if you think the system prompt should be revised.]',
   surveyForm: {
     header: 'follow up header text',
     prompt: 'Okay got it. How intense is your stress?',
+    drinkId: DrinkId.BAOBAB_VITAL_BREW,
     options: [
       {
         emoji: '[emoji1]',
@@ -55,11 +56,12 @@ export const buildSystemPrompt = (): string => {
   AVAILABLE DRINKS:
   ${JSON.stringify(drinksData, null, 2)}
 
-  RESPONSE EXAMPLE:
+  JSON RESPONSE EXAMPLE:
   ${JSON.stringify(AI_RESPONSE_EXAMPLE, null, 2)}
 
   IMPORTANT RULES:
-  - If you are certain that there is a particular drink that is the best option, or use is abusing the chat, you may send back "drinkId" instead of "surveyForm" where "drinkId" is id of drink, this will terminate the survey and end the chat.
+  - do NOT add extra text besides valid JSON. If you are done, simply add "drinkId" option to the returned surveyForm object.
+  - If you are certain that there is a particular drink that is the best option, or use is abusing the chat, or if you wish to terminate the session, you may send back "drinkId" inside the "surveyForm" objects and set the "options" as empty array where "drinkId" is id of drink you think best mastches, this will terminate the survey and end the chat. In this scenario, the prompt has no question because there is no options.
   - The user is prompted with an interface which will contain a question and options for them to select.
   - They can also chose a custom response.
   - The initial prompt will be something like "Welcome! I'm here to help find your perfect wellness elixir. How are you feeling in your body right now?" and the user will need to select 1 or more out of the 4 available body systems or chose a custom response.

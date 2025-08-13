@@ -7,14 +7,16 @@ export enum CONFIG {
 }
 
 export enum STYLE {
-  BUTTON = CONFIG.ROUNDED + ' flex items-center justify-center gap-2 transition-shadow p-4 px-6 hover:ring-3 min-h-16',
+  BUTTON = CONFIG.ROUNDED + ' flex items-center justify-center gap-2 transition-shadow transision-colors p-4 px-6 hover:ring-4 min-h-16',
   BUTTON_DISABLED = 'bg-gray-300 text-gray-500 cursor-not-allowed !ring-0',
   BUTTON_ENABLED = 'cursor-pointer',
   BUTTON_LOADING = 'bg-gray-400 text-white cursor-wait !ring-0',
-  BLACK = STYLE.BUTTON_ENABLED + ' bg-black text-white ring-black/20 hover:ring-black/30',
-  SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-slate-200 text-black',
-  BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white hover:ring-blue-200',
-  ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-white hover:ring-red-200',
+  BLACK = STYLE.BUTTON_ENABLED + ' bg-black text-white ring-black/20',
+  SLATE = STYLE.BUTTON_ENABLED + ' bg-slate-50 ring-yellow-200 text-black hover:bg-yellow-50',
+  SLATE_SELECTED = STYLE.BUTTON_ENABLED + ' bg-yellow-100 ring-yellow-300 ring-4 text-black ',
+  BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white ring-blue-200',
+  BUTTON_BLUE_SHADOW = 'drop-shadow shadow-xl shadow-blue-200',
+  ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-white ring-orange-200',
   YELLOW = STYLE.BUTTON_ENABLED + ' ring-yellow-400 ring-3 bg-yellow-200'
 }
 
