@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Lexend, Geist_Mono, Limelight } from "next/font/google";
 import "./globals.css";
 import { SurveyProvider } from "@/hooks/useSurvey";
 
-const geistSans = Geist({
+const mainSans = Lexend({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -11,6 +11,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const notable = Limelight({
+  variable: "--font-header",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${mainSans.variable} ${geistMono.variable} ${notable.variable} antialiased font-sans`}
       >
         <SurveyProvider>
           {children}

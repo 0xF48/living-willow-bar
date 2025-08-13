@@ -433,7 +433,7 @@ export enum OptionType {
 
 // Survey option interface
 export interface SurveyOption {
-  text?: string;
-  hint?: string;
-  emoji?: string;
+  text?: string | null;
+  hint?: string | null;
+  emoji?: string | null;
 }

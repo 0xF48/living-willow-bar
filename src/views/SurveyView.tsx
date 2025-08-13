@@ -4,7 +4,7 @@ import { CONFIG, OptionType, SurveyOption, STYLE } from '@/data/enums';
 import { useSurvey } from '../hooks/useSurvey';
 import { SurveyNavBar } from '../components/SurveyNavBar';
 import cn from 'classnames'
-import { ArrowBigRightDashIcon, MessageCircleHeartIcon, X, Loader, XIcon } from 'lucide-react';
+import { ArrowBigRightDashIcon, MessageCircleHeartIcon, X, Loader, XIcon, TrashIcon } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import MotionBox from '../components/MotionBox';
@@ -24,7 +24,7 @@ function ResetSurveyButton({ onSubmit, disabled }: { onSubmit: any, disabled: bo
       )
     }>
 
-    <XIcon />
+    <TrashIcon />
 
   </button>
 }
@@ -252,11 +252,11 @@ export function SurveyView() {
       </div>
 
 
-      <div className='w-full text-center font-bold text-2xl'>
+      <div className='w-full text-center font-bold text-4xl font-header'>
         {currentForm.header}
       </div>
 
-      <div className='w-full text-left'>
+      <div className='w-full text-left text-lg'>
         {currentForm.prompt}
       </div>
 

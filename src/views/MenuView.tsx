@@ -23,14 +23,14 @@ function MenuDrinkCard({ matchScore, drinkId, drink, index, isLast }: { matchSco
   const router = useRouter();
 
   // Calculate the same color as the match badge (gray to blue transition)
-  const indexColor = matchScore !== null 
+  const indexColor = matchScore !== null
     ? (() => {
-        const grayValue = Math.round((1 - matchScore) * 128 + 64);
-        const blueValue = Math.round(matchScore * 191 + 64);
-        return matchScore > 0.1 
-          ? `rgb(${grayValue}, ${grayValue}, ${blueValue})`
-          : `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
-      })()
+      const grayValue = Math.round((1 - matchScore) * 128 + 64);
+      const blueValue = Math.round(matchScore * 191 + 64);
+      return matchScore > 0.1
+        ? `rgb(${grayValue}, ${grayValue}, ${blueValue})`
+        : `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+    })()
     : '#374151'; // gray-700 as fallback
 
   const handleClick = () => {
@@ -76,29 +76,27 @@ function MenuDrinkCard({ matchScore, drinkId, drink, index, isLast }: { matchSco
           {drink.name}
         </h3>
 
-        <div className="space-y-3">
-          <div>
-            <div className="text-sm font-semibold text-green-300 mb-1 flex flex-row gap-2 items-center">
-              <RainbowIcon className='w-5' />
-              Flavor
-            </div>
-            <p className="text-sm text-gray-400">{drink.flavorProfile}</p>
+        <div>
+          <div className='-mt-4'>
+            <p className="text-lg font-light text-gray-400">{drink.flavorProfile}</p>
           </div>
 
-          <div>
-            <div className="text-sm font-semibold text-orange-300 mb-1 flex flex-row gap-2 items-center">
-              <CarrotIcon className='w-5' />
-              Ingredients
-            </div>
-            <p className="text-sm text-gray-400">{drink.baseDrink}</p>
-          </div>
 
-          <div>
-            <div className="text-sm font-semibold text-yellow-300 mb-1 flex flex-row gap-2 items-center">
+
+          <div className='mt-4'>
+            <div className="text-sm font-semibold text-yellow-300 mb-1 flex flex-row gap-2 items-center font-header uppercase">
               <ZapIcon className='w-5' />
               Effects
             </div>
-            <p className="text-sm text-gray-400">{drink.effects}</p>
+            <p className="font-light text-md text-gray-400">{drink.effects}</p>
+          </div>
+
+          <div className='mt-4'>
+            <div className="text-sm font-semibold text-white mb-1 flex flex-row gap-2 items-center font-header uppercase">
+              {/* <CarrotIcon className='w-5' /> */}
+              Ingredients
+            </div>
+            <p className="font-light text-sm text-gray-400">{drink.baseDrink}</p>
           </div>
         </div>
       </div>

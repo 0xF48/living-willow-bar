@@ -30,6 +30,7 @@ export interface AIResponseDataType {
 
 
 
+
 // Create entry form with random prompts
 function createEntryForm(): SurveyForm {
   return {
