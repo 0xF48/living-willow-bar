@@ -11,7 +11,7 @@ import MotionBox from '../components/MotionBox';
 import _clone from 'lodash/clone'
 import { TopMatchButton } from '@/components/TopMatchButton';
 
-function ResetSurveyButton({ onSubmit, disabled }: { onSubmit: any, disabled: boolean }) {
+function ResetSurveyButton({ onSubmit, disabled, showText }: { onSubmit: any, disabled: boolean, showText: boolean }) {
   return <button
     disabled={disabled}
     onClick={onSubmit}
@@ -20,12 +20,14 @@ function ResetSurveyButton({ onSubmit, disabled }: { onSubmit: any, disabled: bo
         STYLE.BUTTON,
         disabled
           ? STYLE.BUTTON_DISABLED
-          : STYLE.ORANGE,
-        'font-bold w-20'
+          : STYLE.BLACK,
+        'font-bold w-fit gap-4'
       )
     }>
 
     <TrashIcon />
+    {showText ? <span>reset survey</span> : null}
+
 
   </button>
 }
@@ -53,6 +55,7 @@ function SubmitAnswerButton({ onSubmit, disabled, isLoading }: { onSubmit: any, 
     ) : (
       <>
         <ArrowBigRightDashIcon />
+
       </>
     )}
   </button>
@@ -263,8 +266,9 @@ export function SurveyView() {
         {currentForm.prompt}
       </div>
 
-      {currentForm.drinkId ? <div className='flex'>
+      {currentForm.drinkId ? <div className='flex flex-col items-center gap-4'>
         <TopMatchButton topMatch={{ drinkId: currentForm.drinkId, score: 0 }} />
+        <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} showText={true} />
       </div> : <>
         {currentForm.options.map((opt, i) => {
           return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />

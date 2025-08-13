@@ -16,7 +16,7 @@ export enum STYLE {
   SLATE_SELECTED = STYLE.BUTTON_ENABLED + ' bg-yellow-100 ring-yellow-300 ring-4 text-black ',
   BLUE = STYLE.BUTTON_ENABLED + ' bg-blue-500 text-white ring-blue-200',
   BUTTON_BLUE_SHADOW = 'drop-shadow shadow-xl shadow-blue-200',
-  ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-white ring-orange-200',
+  ORANGE = STYLE.BUTTON_ENABLED + ' bg-orange-300 text-black ring-orange-200',
   YELLOW = STYLE.BUTTON_ENABLED + ' ring-yellow-400 ring-3 bg-yellow-200'
 }
 
