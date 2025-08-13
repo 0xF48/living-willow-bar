@@ -280,7 +280,7 @@ export function SurveyView() {
           </div>
         ) : (
           <div className='w-full flex flex-row gap-4'>
-            <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} />
+            <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} showText={false} />
             <TextAnswerButton currentQuestion={currentForm.prompt} onSubmit={submitResponseText} />
             <SubmitAnswerButton onSubmit={submitResponseOptions} disabled={nonSelected} isLoading={isLoading} />
           </div>
