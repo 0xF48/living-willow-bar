@@ -38,7 +38,7 @@ export function TopMatchButton({ topMatch }: TopMatchButtonProps) {
         <span className="font-bold text-gray-900 text-sm leading-tight group-hover:underline transition-all">
           {drink.name}
         </span>
-        <MatchLabel matchScore={topMatch.score} className="self-start mt-1" />
+        {topMatch.score ? <MatchLabel matchScore={topMatch.score} className="self-start mt-1" /> : null}
       </div>
     </button>
   );

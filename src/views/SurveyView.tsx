@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import MotionBox from '../components/MotionBox';
 import _clone from 'lodash/clone'
+import { TopMatchButton } from '@/components/TopMatchButton';
 
 function ResetSurveyButton({ onSubmit, disabled }: { onSubmit: any, disabled: boolean }) {
   return <button
@@ -188,7 +189,7 @@ function SurveyOptionButton({ option, onSelect, selected, index }: { index: numb
 
 export function SurveyView() {
 
-  const { isLoading, resetSurvey, currentForm, responseList, submitForm } = useSurvey()
+  const { surveyDrink, isLoading, resetSurvey, currentForm, responseList, submitForm } = useSurvey()
 
   const [selected, setSelected] = useState<boolean[]>([])
 
@@ -260,21 +261,25 @@ export function SurveyView() {
         {currentForm.prompt}
       </div>
 
-      {currentForm.options.map((opt, i) => {
-        return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />
-      })}
+      {surveyDrink ? <div className='flex'>
+        <TopMatchButton topMatch={{ drinkId: surveyDrink, score: 0 }} />
+      </div> : <>
+        {currentForm.options.map((opt, i) => {
+          return <SurveyOptionButton onSelect={toggleOptionSelect} key={i} index={i} option={opt} selected={selected[i] === true} />
+        })}
 
-      {!currentForm.options.length ? (
-        <div className='w-full text-center text-green-600 font-bold'>
-          Assessment complete! Your recommendation is ready.
-        </div>
-      ) : (
-        <div className='w-full flex flex-row gap-4'>
-          <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} />
-          <TextAnswerButton currentQuestion={currentForm.prompt} onSubmit={submitResponseText} />
-          <SubmitAnswerButton onSubmit={submitResponseOptions} disabled={nonSelected} isLoading={isLoading} />
-        </div>
-      )}
+        {!currentForm.options.length ? (
+          <div className='w-full text-center text-green-600 font-bold'>
+            Assessment complete! Your recommendation is ready.
+          </div>
+        ) : (
+          <div className='w-full flex flex-row gap-4'>
+            <ResetSurveyButton onSubmit={resetSurvey} disabled={noResponses} />
+            <TextAnswerButton currentQuestion={currentForm.prompt} onSubmit={submitResponseText} />
+            <SubmitAnswerButton onSubmit={submitResponseOptions} disabled={nonSelected} isLoading={isLoading} />
+          </div>
+        )}
+      </>}
 
 
     </div>

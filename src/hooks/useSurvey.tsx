@@ -14,6 +14,7 @@ export interface UseSurveyReturn {
   submitForm: (response: SurveyResponse) => void;
   responseList: SurveyResponse[];
   isLoading: boolean;
+  surveyDrink?: DrinkId | null;
   error: string | null;
   healthMatrix: HealthMatrix | null;
   resetSurvey: () => void;
@@ -22,7 +23,9 @@ export interface UseSurveyReturn {
 
 
 export interface AIResponseDataType {
-  surveyForm: SurveyForm,
+  surveyForm?: SurveyForm,
+  drinkId?: DrinkId,
+  systemMessage?: string,
   healthMatrix: HealthMatrix
 }
 
@@ -177,6 +180,7 @@ export function useSurveyInternal(): UseSurveyReturn {
   const [error, setError] = useState<string | null>(null);
   const [responseList, setResponseList] = useState<SurveyResponse[]>([])
   const [currentForm, setCurrentForm] = useState<SurveyForm>(EMPTY_ENTRY_FORM)
+  const [surveyDrink, setSurveyDrink] = useState<DrinkId | null>(null)
 
   // Set random entry form after hydration to avoid SSR mismatch
   useEffect(() => {
@@ -236,7 +240,12 @@ export function useSurveyInternal(): UseSurveyReturn {
         throw new Error(`AI response is not valid JSON: ${aiResponseText}`);
       }
 
-      setCurrentForm(aiResponse.surveyForm)
+      if (aiResponse.surveyForm) {
+        setCurrentForm(aiResponse.surveyForm)
+      } else if (aiResponse.drinkId) {
+        setSurveyDrink(aiResponse.drinkId)
+      }
+
 
       // Process AI response
       const healthMatrix = aiResponse.healthMatrix;
@@ -244,10 +253,10 @@ export function useSurveyInternal(): UseSurveyReturn {
       console.log('Health Matrix:', healthMatrix);
       console.log('========================');
 
-      if (!healthMatrix || !validateHealthMatrix(healthMatrix)) {
-        console.error('Invalid health matrix:', healthMatrix);
-        throw new Error('AI response missing or invalid healthMatrix');
-      }
+      // if (!healthMatrix || !validateHealthMatrix(healthMatrix)) {
+      //   console.error('Invalid health matrix:', healthMatrix);
+      //   throw new Error('AI response missing or invalid healthMatrix');
+      // }
 
       setHealthMatrix(healthMatrix)
 
@@ -273,6 +282,7 @@ export function useSurveyInternal(): UseSurveyReturn {
 
   return {
     currentForm,
+    surveyDrink,
     submitForm,
     responseList,
     healthMatrix,

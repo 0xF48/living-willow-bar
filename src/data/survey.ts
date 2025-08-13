@@ -1,4 +1,4 @@
-import { EffectType, HealthMatrix, BODY_SYSTEM_MATRIX_MAPPING, EMPTY_HEALTH_MATRIX } from './enums';
+import { EffectType, HealthMatrix, BODY_SYSTEM_MATRIX_MAPPING, EMPTY_HEALTH_MATRIX, DrinkId } from './enums';
 import { DRINKS } from './drinks';
 import { AIResponseDataType } from '@/hooks/useSurvey';
 
@@ -7,13 +7,17 @@ import { AIResponseDataType } from '@/hooks/useSurvey';
 
 const AI_RESPONSE_EXAMPLE: AIResponseDataType = {
   healthMatrix: EMPTY_HEALTH_MATRIX,
+  //@ts-ignore
+  drinkId: DrinkId.BAOBAB_VITAL_BREW,
+  systemMessage: '[you can add a response for developer if you think the system prompt should be revised.]',
   surveyForm: {
-    header: 'follow up text',
-    prompt: 'How intense is your stress?',
+    header: 'follow up header text',
+    prompt: 'Okay got it. How intense is your stress?',
     options: [
       {
         emoji: '[emoji1]',
-        text: 'stressed out'
+        text: 'stressed out',
+        hint: 'some optional hint if you think its nessesary'
       },
       {
         emoji: '[emoji2]',
@@ -37,10 +41,13 @@ export const buildSystemPrompt = (): string => {
   }));
 
   const systemPrompt = `
-  Your job is to match users with the perfect drink thats right for them.
-  Each drink has 
-  You will respond ONLY in JSON.
-
+  Your job is to triage users with the perfect health drink - "elxir" - thats right for them out of the available drinks by giving them a simple survey. 
+  You must do this in a smart way to triage to the correct drink based on what the user is feeling in their body / mind.
+  Imagine you something like a blend between a doctor and a bartender.
+  Each drink has specific effects which are computed from its ingredients.
+  These effects form a health matrix that you need to compute with each response.
+  The drinks will be matched from the matrix that you compute and suggested to the user.
+  !!!Respond ONLY in JSON!!
 
   BODY SYSTEMS & MATRIX MAPPINGS:
   ${JSON.stringify(BODY_SYSTEM_MATRIX_MAPPING, null, 2)}
@@ -48,18 +55,25 @@ export const buildSystemPrompt = (): string => {
   AVAILABLE DRINKS:
   ${JSON.stringify(drinksData, null, 2)}
 
-  CORRECT RESPONSE EXAMPLE:
+  RESPONSE EXAMPLE:
   ${JSON.stringify(AI_RESPONSE_EXAMPLE, null, 2)}
 
   IMPORTANT RULES:
-  - JSON output format should be as follows:
-  - Always return a healthMatrix after each question to track progress
+  - If you are certain that there is a particular drink that is the best option, or use is abusing the chat, you may send back "drinkId" instead of "surveyForm" where "drinkId" is id of drink, this will terminate the survey and end the chat.
+  - The user is prompted with an interface which will contain a question and options for them to select.
+  - They can also chose a custom response.
+  - The initial prompt will be something like "Welcome! I'm here to help find your perfect wellness elixir. How are you feeling in your body right now?" and the user will need to select 1 or more out of the 4 available body systems or chose a custom response.
+  - You will get data indicating which system, and you can already start computing the health matrix.
+  - Users may enter anything they want in the custom response, ignore any responses that are not relevant.
+  - Users may ignore the prompt and enter custom text like "what drink gives me most energy", in these scenarios just send back drinkId to terminate the survey
+  - Dont do more than 7 survey steps.
+  - Always return a healthMatrix after each question, this will be used to rank and suggest the drinks, for example after first response if user selects "MENTAL" body system, you can fill out the health matrix to 
   - ALWAYS provide exactly 2-4 options in the options array - NEVER return null
   - Keep questions short and concise
-  - Put answer choices only in the options array, not in the question
   - Focus on distinguishing between drinks that you think will best fit based on previous answers
   - Ask about intensity, timing, symptoms, or preferences
   - Example good question: "How intense is your stress?" with options: ["Mild tension", "Moderate anxiety", "High stress", "Overwhelming"]
+  - !!!Please respond ONLY in JSON or you will BREAK the APP :)!!!
 `;
 
   // Debug: Log system prompt

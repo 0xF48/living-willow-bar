@@ -156,10 +156,10 @@ export const EFFECT_MODES: Record<EffectType, EffectMode> = {
 
 // Body system categories for survey mapping
 export enum BodySystem {
-  MENTAL,
-  DIGESTIVE,
-  VITALITY,
-  RECOVERY
+  MENTAL = 'MENTAL',
+  DIGESTIVE = 'DIGESTIVE',
+  VITALITY = 'VITALITY',
+  RECOVERY = 'RECOVERY'
 }
 
 
